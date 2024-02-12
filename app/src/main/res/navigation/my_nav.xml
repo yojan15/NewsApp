@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/my_nav"
+    app:startDestination="@id/topHeadlines">
+
+    <fragment
+        android:id="@+id/topHeadlines"
+        android:name="com.example.newsapp.fragments.TopHeadlines"
+        android:label="fragment_top_headlines"
+        tools:layout="@layout/fragment_top_headlines" >
+        <action
+            android:id="@+id/action_topHeadlines_to_business"
+            app:destination="@id/business" />
+        <action
+            android:id="@+id/action_topHeadlines_to_entertainment"
+            app:destination="@id/entertainment" />
+    </fragment>
+    <fragment
+        android:id="@+id/business"
+        android:name="com.example.newsapp.fragments.Business"
+        android:label="fragment_business"
+        tools:layout="@layout/fragment_business" >
+        <action
+            android:id="@+id/action_business_to_topHeadlines"
+            app:destination="@id/topHeadlines" />
+        <action
+            android:id="@+id/action_business_to_entertainment"
+            app:destination="@id/entertainment" />
+    </fragment>
+    <fragment
+        android:id="@+id/entertainment"
+        android:name="com.example.newsapp.fragments.Entertainment"
+        android:label="fragment_entertainment"
+        tools:layout="@layout/fragment_entertainment" >
+        <action
+            android:id="@+id/action_entertainment_to_topHeadlines"
+            app:destination="@id/topHeadlines" />
+        <action
+            android:id="@+id/action_entertainment_to_business"
+            app:destination="@id/business" />
+    </fragment>
+</navigation>
