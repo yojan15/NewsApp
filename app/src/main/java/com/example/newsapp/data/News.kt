@@ -8,21 +8,16 @@ data class News (
 
 data class Article (
     val publishedAt: String,
-    val author: String,
+    val urlToImage: String? = null,
+    val description: String? = null,
     val source: Source,
     val title: String,
-    val url: String
+    val url: String,
+    val author: String? = null,
+    val content: String? = null
 )
 
 data class Source (
-    val name: Name,
-    val id: ID
+    val name: String,
+    val id: String? = null
 )
-
-enum class ID {
-    GoogleNewsIn
-}
-
-enum class Name {
-    GoogleNewsIndia
-}

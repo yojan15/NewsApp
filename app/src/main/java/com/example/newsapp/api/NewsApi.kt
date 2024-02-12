@@ -5,12 +5,11 @@ import retrofit2.Call
 import retrofit2.http.GET
 import retrofit2.http.Query
 
-interface NewsApi  {
+interface NewsApi {
 
     @GET("top-headlines")
-
     fun getNews(
-        @Query("source") query: String = "google-news-in",
+        @Query("country") country: String = "in",
         @Query("apiKey") apiKey: String = "f8b7a3eefc6549d2822d921d51325364"
-    ) : Call<News>
+    ): Call<News>
 }
