@@ -30,7 +30,6 @@ private lateinit var newsAdapter: NewsAdapter
         setupRecyclerView()
         return binding.root
     }
-
     private fun setupRecyclerView() {
         newsAdapter = NewsAdapter()
         binding.sportsRecyclerView.adapter = newsAdapter
@@ -39,31 +38,33 @@ private lateinit var newsAdapter: NewsAdapter
     private fun getNews() {
         val retrofitBuilder = Retrofit.Builder()
             .addConverterFactory(GsonConverterFactory.create())
-            .baseUrl("https://newsapi/org/v2")
+            .baseUrl("https://newsapi.org/v2/")
             .build()
             .create(SportsNewsApi::class.java)
+
         val retrofitData = retrofitBuilder.getNews()
         retrofitData.enqueue(object : Callback<News> {
             override fun onResponse(call: Call<News>, response: Response<News>) {
-                if(response.isSuccessful) {
+                if (response.isSuccessful) {
                     val newsResponse = response.body()
-                    if(newsResponse != null) { 
+                    if (newsResponse != null) {
                         val articles = newsResponse.articles
 
-                        Log.e("MainActivity","Response code : ${response.code()}")
-                        Log.e("MainActivity","Number of articles : ${articles.size}")
+                        Log.d("MainActivity", "Response code: ${response.code()}")
+                        Log.d("MainActivity", "Number of articles: ${articles.size}")
 
-                        newsAdapter.submitList(articles)
+                        newsAdapter.submitList(articles) // Update the adapter with the new list
                     } else {
-                        Log.e("MainActivity", "news response is null")
+                        Log.e("MainActivity", "News response is null")
                     }
                 } else {
-                    Log.e("MainActivity","Error ${response.message()}")
-                    Log.e("MainActivity","Error body ${response.errorBody()}")
+                    Log.e("MainActivity", "Error: ${response.message()}")
+
+                    Log.e("MainActivity", "Error Body: ${response.errorBody()?.string()}")
                 }
             }
             override fun onFailure(call: Call<News>, t: Throwable) {
-                Log.e("MainActivity","$t")
+                Log.e("MainActivity", "Failed to get news", t)
             }
 
         })
