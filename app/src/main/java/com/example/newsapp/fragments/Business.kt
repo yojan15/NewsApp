@@ -16,7 +16,7 @@ import retrofit2.Callback
 import retrofit2.Response
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
-
+    
 class Business : Fragment() {
     private lateinit var binding : FragmentBusinessBinding
     private lateinit var newsAdapter : NewsAdapter
@@ -65,7 +65,6 @@ class Business : Fragment() {
             override fun onFailure(call: Call<News>, t: Throwable) {
                 Log.e("MainActivity", "Failed to get news", t)
             }
-
         })
     }
 }

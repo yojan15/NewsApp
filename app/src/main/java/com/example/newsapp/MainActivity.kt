@@ -25,10 +25,8 @@ class MainActivity : AppCompatActivity() {
 
         fab.setOnClickListener {
             showPopupMenu(fab)
-
         }
     }
-
     private fun showPopupMenu(view: View) {
         val popupMenu = PopupMenu(this,view)
         popupMenu.inflate(R.menu.menu_fab)

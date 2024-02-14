@@ -9,7 +9,6 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.newsapp.adapter.NewsAdapter
 import com.example.newsapp.api.EntertainmentNewApi
-import com.example.newsapp.api.NewsApi
 import com.example.newsapp.data.News
 import com.example.newsapp.databinding.FragmentEntertainmentBinding
 import retrofit2.Call
