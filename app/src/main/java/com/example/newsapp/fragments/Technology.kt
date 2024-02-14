@@ -6,9 +6,11 @@ import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.newsapp.adapter.NewsAdapter
 import com.example.newsapp.api.TechnologyNewsApi
+import com.example.newsapp.data.Article
 import com.example.newsapp.data.News
 import com.example.newsapp.databinding.FragmentTechnologyBinding
 import retrofit2.Call
@@ -17,7 +19,7 @@ import retrofit2.Response
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 
-class Technology : Fragment() {
+class Technology : Fragment() , NewsAdapter.OnItemClickListener {
     private lateinit var binding: FragmentTechnologyBinding
     private lateinit var newsAdapter: NewsAdapter
     override fun onCreateView(
@@ -31,7 +33,7 @@ class Technology : Fragment() {
         return binding.root
     }
     private fun setupRecyclerView() {
-        newsAdapter = NewsAdapter()
+        newsAdapter = NewsAdapter(this)
         binding.technologyRecyclerView.adapter = newsAdapter
         binding.technologyRecyclerView.layoutManager = LinearLayoutManager(requireContext())
     }
@@ -66,7 +68,10 @@ class Technology : Fragment() {
             override fun onFailure(call: Call<News>, t: Throwable) {
                 Log.e("MainActivity", "Failed to get news", t)
             }
-
         })
+    }
+    override fun onItemClick(article: Article) {
+        val action = TechnologyDirections.actionTechnology2ToFullNewsFragment(article)
+        findNavController().navigate(action)
     }
 }

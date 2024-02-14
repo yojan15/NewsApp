@@ -6,9 +6,12 @@ import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
+import com.example.newsapp.R
 import com.example.newsapp.adapter.NewsAdapter
 import com.example.newsapp.api.SportsNewsApi
+import com.example.newsapp.data.Article
 import com.example.newsapp.data.News
 import com.example.newsapp.databinding.FragmentSportsBinding
 import retrofit2.Call
@@ -17,7 +20,7 @@ import retrofit2.Response
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 
-class Sports : Fragment() {
+class Sports : Fragment(), NewsAdapter.OnItemClickListener {
 private lateinit var binding : FragmentSportsBinding
 private lateinit var newsAdapter: NewsAdapter
     override fun onCreateView(
@@ -31,7 +34,7 @@ private lateinit var newsAdapter: NewsAdapter
         return binding.root
     }
     private fun setupRecyclerView() {
-        newsAdapter = NewsAdapter()
+        newsAdapter = NewsAdapter(this)
         binding.sportsRecyclerView.adapter = newsAdapter
         binding.sportsRecyclerView.layoutManager = LinearLayoutManager(requireContext())
     }
@@ -68,5 +71,10 @@ private lateinit var newsAdapter: NewsAdapter
             }
 
         })
+    }
+
+    override fun onItemClick(article: Article) {
+        val action = SportsDirections.actionSports2ToFullNewsFragment(article)
+        findNavController().navigate(action)
     }
 }

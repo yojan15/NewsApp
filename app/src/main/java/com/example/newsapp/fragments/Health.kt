@@ -6,9 +6,12 @@ import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
+import com.example.newsapp.R
 import com.example.newsapp.adapter.NewsAdapter
 import com.example.newsapp.api.HealthNewsApi
+import com.example.newsapp.data.Article
 import com.example.newsapp.data.News
 import com.example.newsapp.databinding.FragmentHealthBinding
 import retrofit2.Call
@@ -17,7 +20,7 @@ import retrofit2.Response
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 
-class Health : Fragment() {
+class Health : Fragment(), NewsAdapter.OnItemClickListener {
     private lateinit var binding : FragmentHealthBinding
     private lateinit var newsAdapter: NewsAdapter
     override fun onCreateView(
@@ -32,7 +35,7 @@ class Health : Fragment() {
     }
 
     private fun setupRecyclerView() {
-        newsAdapter = NewsAdapter()
+        newsAdapter = NewsAdapter(this)
         binding.healthRecyclerView.adapter = newsAdapter
         binding.healthRecyclerView.layoutManager = LinearLayoutManager(requireContext())
 
@@ -69,5 +72,10 @@ class Health : Fragment() {
             }
 
         })
+    }
+
+    override fun onItemClick(article: Article) {
+        val action = HealthDirections.actionHealth2ToFullNewsFragment(article)
+        findNavController().navigate(action)
     }
 }

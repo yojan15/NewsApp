@@ -6,9 +6,11 @@ import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.newsapp.adapter.NewsAdapter
 import com.example.newsapp.api.NewsApi
+import com.example.newsapp.data.Article
 import com.example.newsapp.data.News
 import com.example.newsapp.databinding.FragmentTopHeadlinesBinding
 import retrofit2.Call
@@ -16,7 +18,7 @@ import retrofit2.Callback
 import retrofit2.Response
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
-class TopHeadlines : Fragment() {
+class TopHeadlines : Fragment() , NewsAdapter.OnItemClickListener {
     private lateinit var binding : FragmentTopHeadlinesBinding
     private lateinit var newsAdapter : NewsAdapter
     override fun onCreateView(
@@ -29,7 +31,7 @@ class TopHeadlines : Fragment() {
         return binding.root
     }
     private fun setupRecyclerView() {
-        newsAdapter = NewsAdapter()
+        newsAdapter = NewsAdapter(this)
         binding.recyclerView.adapter = newsAdapter
         binding.recyclerView.layoutManager = LinearLayoutManager(requireContext())
     }
@@ -64,7 +66,10 @@ class TopHeadlines : Fragment() {
             override fun onFailure(call: Call<News>, t: Throwable) {
                 Log.e("MainActivity", "Failed to get news", t)
             }
-
         })
+    }
+    override fun onItemClick(article: Article) {
+        val action = TopHeadlinesDirections.actionTopHeadlinesToFullNewsFragment(article)
+        findNavController().navigate(action)
     }
 }

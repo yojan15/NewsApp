@@ -6,9 +6,12 @@ import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
+import com.example.newsapp.R
 import com.example.newsapp.adapter.NewsAdapter
 import com.example.newsapp.api.BusinessNewsApi
+import com.example.newsapp.data.Article
 import com.example.newsapp.data.News
 import com.example.newsapp.databinding.FragmentBusinessBinding
 import retrofit2.Call
@@ -17,7 +20,7 @@ import retrofit2.Response
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
     
-class Business : Fragment() {
+class Business : Fragment() , NewsAdapter.OnItemClickListener {
     private lateinit var binding : FragmentBusinessBinding
     private lateinit var newsAdapter : NewsAdapter
     override fun onCreateView(
@@ -30,7 +33,7 @@ class Business : Fragment() {
         return binding.root
     }
     private fun setupRecyclerView() {
-        newsAdapter = NewsAdapter()
+        newsAdapter = NewsAdapter(this)
         binding.businessRecyclerView.adapter = newsAdapter
         binding.businessRecyclerView.layoutManager = LinearLayoutManager(requireContext())
     }
@@ -66,5 +69,10 @@ class Business : Fragment() {
                 Log.e("MainActivity", "Failed to get news", t)
             }
         })
+    }
+    override fun onItemClick(article: Article) {
+//        findNavController().navigate(R.id.action_business2_to_fullNewsFragment)
+        val action = BusinessDirections.actionBusiness2ToFullNewsFragment(article)
+        findNavController().navigate(action)
     }
 }

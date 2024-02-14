@@ -6,9 +6,12 @@ import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
+import com.example.newsapp.R
 import com.example.newsapp.adapter.NewsAdapter
 import com.example.newsapp.api.EntertainmentNewApi
+import com.example.newsapp.data.Article
 import com.example.newsapp.data.News
 import com.example.newsapp.databinding.FragmentEntertainmentBinding
 import retrofit2.Call
@@ -17,7 +20,7 @@ import retrofit2.Response
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 
-class Entertainment : Fragment() {
+class Entertainment : Fragment(), NewsAdapter.OnItemClickListener {
     private lateinit var binding : FragmentEntertainmentBinding
     private lateinit var newsAdapter: NewsAdapter
 
@@ -32,7 +35,7 @@ class Entertainment : Fragment() {
         return binding.root
     }
     private fun setupRecyclerView() {
-        newsAdapter = NewsAdapter()
+        newsAdapter = NewsAdapter(this)
         binding.entertainmentRecyclerView.adapter = newsAdapter
         binding.entertainmentRecyclerView.layoutManager = LinearLayoutManager(requireContext())
     }
@@ -69,5 +72,9 @@ class Entertainment : Fragment() {
             }
 
         })
+    }
+
+    override fun onItemClick(article: Article) {
+     findNavController().navigate(R.id.action_entertainment2_to_fullNewsFragment)
     }
 }
