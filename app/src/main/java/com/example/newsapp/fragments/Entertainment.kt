@@ -75,6 +75,6 @@ class Entertainment : Fragment(), NewsAdapter.OnItemClickListener {
     }
 
     override fun onItemClick(article: Article) {
-     findNavController().navigate(R.id.action_entertainment2_to_fullNewsFragment)
+     //findNavController().navigate(R.id.action_entertainment2_to_fullNewsFragment)
     }
 }

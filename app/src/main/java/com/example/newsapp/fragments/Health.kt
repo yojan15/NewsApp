@@ -75,7 +75,7 @@ class Health : Fragment(), NewsAdapter.OnItemClickListener {
     }
 
     override fun onItemClick(article: Article) {
-        val action = HealthDirections.actionHealth2ToFullNewsFragment(article)
-        findNavController().navigate(action)
+//        val action = HealthDirections.actionHealth2ToFullNewsFragment(article)
+//        findNavController().navigate(action)
     }
 }

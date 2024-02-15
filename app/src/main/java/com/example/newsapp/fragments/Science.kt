@@ -75,7 +75,7 @@ class Science : Fragment(), NewsAdapter.OnItemClickListener {
         })
     }
     override fun onItemClick(article: Article) {
-        val action = ScienceDirections.actionScience2ToFullNewsFragment(article)
-        findNavController().navigate(action)
+//        val action = ScienceDirections.actionScience2ToFullNewsFragment(article)
+//        findNavController().navigate(action)
     }
 }

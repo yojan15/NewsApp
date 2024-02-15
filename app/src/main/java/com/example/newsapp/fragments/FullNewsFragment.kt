@@ -34,7 +34,7 @@ class FullNewsFragment : Fragment(){
                 .placeholder(R.drawable.placeholder_image)
                 .into(binding.fullNewsImageView)
         } ?: run {
-           Log.e("MainActivity","Null")
+           Log.e("FullNewsFragment","Null")
         }
     }
 }

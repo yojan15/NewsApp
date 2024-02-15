@@ -74,7 +74,7 @@ private lateinit var newsAdapter: NewsAdapter
     }
 
     override fun onItemClick(article: Article) {
-        val action = SportsDirections.actionSports2ToFullNewsFragment(article)
-        findNavController().navigate(action)
+//        val action = SportsDirections.actionSports2ToFullNewsFragment(article)
+//        findNavController().navigate(action)
     }
 }

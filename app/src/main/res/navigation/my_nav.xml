@@ -1,4 +1,3 @@
-<?xml version="1.0" encoding="utf-8"?>
 <navigation xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
@@ -18,87 +17,33 @@
                 app:argType="com.example.newsapp.data.Article" />
         </action>
     </fragment>
+
     <fragment
         android:id="@+id/fullNewsFragment"
         android:name="com.example.newsapp.fragments.FullNewsFragment"
         android:label="fragment_full_news"
         tools:layout="@layout/fragment_full_news" />
+
     <fragment
         android:id="@+id/business"
         android:name="com.example.newsapp.fragments.Business"
         android:label="fragment_business"
         tools:layout="@layout/fragment_business">
         <action
-            android:id="@+id/action_business2_to_fullNewsFragment"
+            android:id="@+id/action_business_to_fullNewsFragment"
             app:destination="@id/fullNewsFragment">
             <argument
                 android:name="selectedArticle"
                 app:argType="com.example.newsapp.data.Article" />
         </action>
-    </fragment>
-    <fragment
-        android:id="@+id/entertainment"
-        android:name="com.example.newsapp.fragments.Entertainment"
-        android:label="fragment_entertainment"
-        tools:layout="@layout/fragment_entertainment" >
         <action
-            android:id="@+id/action_entertainment2_to_fullNewsFragment"
+            android:id="@+id/action_business_to_fullNewsFragment1"
             app:destination="@id/fullNewsFragment">
             <argument
                 android:name="selectedArticle"
                 app:argType="com.example.newsapp.data.Article" />
         </action>
     </fragment>
-    <fragment
-        android:id="@+id/health2"
-        android:name="com.example.newsapp.fragments.Health"
-        android:label="fragment_health"
-        tools:layout="@layout/fragment_health" >
-        <action
-            android:id="@+id/action_health2_to_fullNewsFragment"
-            app:destination="@id/fullNewsFragment">
-            <argument
-                android:name="selectedArticle"
-                app:argType="com.example.newsapp.data.Article" />
-        </action>
-    </fragment>
-    <fragment
-        android:id="@+id/science2"
-        android:name="com.example.newsapp.fragments.Science"
-        android:label="fragment_science"
-        tools:layout="@layout/fragment_science" >
-        <action
-            android:id="@+id/action_science2_to_fullNewsFragment"
-            app:destination="@id/fullNewsFragment">
-            <argument
-                android:name="selectedArticle"
-                app:argType="com.example.newsapp.data.Article" />
-        </action>
-    </fragment>
-    <fragment
-        android:id="@+id/sports2"
-        android:name="com.example.newsapp.fragments.Sports"
-        android:label="fragment_sports"
-        tools:layout="@layout/fragment_sports" >
-        <action
-            android:id="@+id/action_sports2_to_fullNewsFragment"
-            app:destination="@id/fullNewsFragment">
-            <argument
-                android:name="selectedArticle"
-                app:argType="com.example.newsapp.data.Article" />
-        </action>
-    </fragment>
-    <fragment
-        android:id="@+id/technology2"
-        android:name="com.example.newsapp.fragments.Technology"
-        android:label="fragment_technology"
-        tools:layout="@layout/fragment_technology" >
-        <action
-            android:id="@+id/action_technology2_to_fullNewsFragment"
-            app:destination="@id/fullNewsFragment">
-            <argument
-                android:name="selectedArticle"
-                app:argType="com.example.newsapp.data.Article" />
-        </action>
-    </fragment>
+
+
 </navigation>

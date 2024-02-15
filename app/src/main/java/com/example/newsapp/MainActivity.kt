@@ -5,6 +5,8 @@ import android.os.Bundle
 import android.view.View
 import android.widget.PopupMenu
 import androidx.fragment.app.Fragment
+import androidx.navigation.findNavController
+import androidx.navigation.fragment.NavHostFragment
 import com.example.newsapp.databinding.ActivityMainBinding
 import com.example.newsapp.fragments.Business
 import com.example.newsapp.fragments.Entertainment
@@ -12,6 +14,7 @@ import com.example.newsapp.fragments.Health
 import com.example.newsapp.fragments.Science
 import com.example.newsapp.fragments.Sports
 import com.example.newsapp.fragments.Technology
+import com.example.newsapp.fragments.TopHeadlines
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 
 class MainActivity : AppCompatActivity() {
@@ -20,6 +23,7 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
+
         /*
         * call FloatingActionButton from xml and add onClickListener to popUp
         * sub menus of FAB*/
@@ -29,34 +33,39 @@ class MainActivity : AppCompatActivity() {
         }
     }
     private fun showPopupMenu(view: View) {
-        val popupMenu = PopupMenu(this,view)
+        val popupMenu = PopupMenu(this, view)
         popupMenu.inflate(R.menu.menu_fab)
 
-
         popupMenu.setOnMenuItemClickListener { item ->
-            when(item.itemId) {
+            val navController = findNavController(R.id.fragmentContainerView)
+
+            when (item.itemId) {
+                R.id.topHeadlines -> {
+                    navController.navigate(R.id.topHeadlines)
+                    true
+                }
                 R.id.business -> {
-                    openFragment(Business())
+                    navController.navigate(R.id.business)
                     true
                 }
                 R.id.entertainment -> {
-                    openFragment(Entertainment())
+                    navController.navigate(R.id.entertainment)
                     true
                 }
                 R.id.health -> {
-                    openFragment(Health())
+                    navController.navigate(R.id.health)
                     true
                 }
                 R.id.sports -> {
-                    openFragment(Sports())
+                    navController.navigate(R.id.sports)
                     true
                 }
                 R.id.science -> {
-                    openFragment(Science())
+                    navController.navigate(R.id.science)
                     true
                 }
                 R.id.technology -> {
-                    openFragment(Technology())
+                    navController.navigate(R.id.technology)
                     true
                 }
                 else -> false
@@ -66,7 +75,7 @@ class MainActivity : AppCompatActivity() {
     }
     private fun openFragment(fragment: Fragment) {
         supportFragmentManager.beginTransaction()
-            .replace(binding.fragmentContainerView.id, fragment)
+            .replace(R.id.fragmentContainerView, fragment)
             .addToBackStack(null)
             .commit()
     }
