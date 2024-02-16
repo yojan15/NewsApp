@@ -1,5 +1,7 @@
 package com.example.newsapp.fragments
 
+import android.content.Intent
+import android.net.Uri
 import android.os.Bundle
 import android.util.Log
 import androidx.fragment.app.Fragment
@@ -33,8 +35,18 @@ class FullNewsFragment : Fragment(){
                 .load(article.urlToImage)
                 .placeholder(R.drawable.placeholder_image)
                 .into(binding.fullNewsImageView)
+
+            binding.fullNewsUrl.text = article.url
+            binding.fullNewsUrl.setOnClickListener {
+                openWebPage(article.url)
+            }
         } ?: run {
            Log.e("FullNewsFragment","Null")
         }
+    }
+
+    private fun openWebPage(url : String) {
+        val intent = Intent(Intent.ACTION_VIEW, Uri.parse(url))
+        startActivity(intent)
     }
 }
