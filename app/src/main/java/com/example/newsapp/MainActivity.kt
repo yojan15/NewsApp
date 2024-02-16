@@ -6,15 +6,7 @@ import android.view.View
 import android.widget.PopupMenu
 import androidx.fragment.app.Fragment
 import androidx.navigation.findNavController
-import androidx.navigation.fragment.NavHostFragment
 import com.example.newsapp.databinding.ActivityMainBinding
-import com.example.newsapp.fragments.Business
-import com.example.newsapp.fragments.Entertainment
-import com.example.newsapp.fragments.Health
-import com.example.newsapp.fragments.Science
-import com.example.newsapp.fragments.Sports
-import com.example.newsapp.fragments.Technology
-import com.example.newsapp.fragments.TopHeadlines
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 
 class MainActivity : AppCompatActivity() {

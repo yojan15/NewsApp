@@ -45,5 +45,74 @@
         </action>
     </fragment>
 
+    <fragment
+        android:id="@+id/technology"
+        android:name="com.example.newsapp.fragments.Technology"
+        android:label="fragment_technology"
+        tools:layout="@layout/fragment_technology" >
+        <action
+            android:id="@+id/action_technology_to_fullNewsFragment"
+            app:destination="@id/fullNewsFragment">
+            <argument
+                android:name="selectedArticle"
+                app:argType="com.example.newsapp.data.Article" />
+        </action>
+    </fragment>
+
+    <fragment
+        android:id="@+id/entertainment"
+        android:name="com.example.newsapp.fragments.Entertainment"
+        android:label="fragment_entertainment"
+        tools:layout="@layout/fragment_entertainment" >
+        <action
+            android:id="@+id/action_entertainment2_to_fullNewsFragment"
+            app:destination="@id/fullNewsFragment">
+            <argument
+                android:name="selectedArticle"
+                app:argType="com.example.newsapp.data.Article" />
+        </action>
+    </fragment>
+
+    <fragment
+        android:id="@+id/health"
+        android:name="com.example.newsapp.fragments.Health"
+        android:label="fragment_health"
+        tools:layout="@layout/fragment_health" >
+        <action
+            android:id="@+id/action_health_to_fullNewsFragment"
+            app:destination="@id/fullNewsFragment">
+            <argument
+                android:name="selectedArticle"
+                app:argType="com.example.newsapp.data.Article" />
+        </action>
+    </fragment>
+
+    <fragment
+        android:id="@+id/science"
+        android:name="com.example.newsapp.fragments.Science"
+        android:label="fragment_science"
+        tools:layout="@layout/fragment_science" >
+        <action
+            android:id="@+id/action_science2_to_fullNewsFragment"
+            app:destination="@id/fullNewsFragment">
+            <argument
+                android:name="selectedArticle"
+                app:argType="com.example.newsapp.data.Article" />
+        </action>
+    </fragment>
+
+    <fragment
+        android:id="@+id/sports"
+        android:name="com.example.newsapp.fragments.Sports"
+        android:label="fragment_sports"
+        tools:layout="@layout/fragment_sports" >
+        <action
+            android:id="@+id/action_sports_to_fullNewsFragment"
+            app:destination="@id/fullNewsFragment">
+            <argument
+                android:name="selectedArticle"
+                app:argType="com.example.newsapp.data.Article" />
+        </action>
+    </fragment>
 
 </navigation>

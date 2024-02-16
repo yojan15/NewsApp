@@ -8,7 +8,6 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
-import com.example.newsapp.R
 import com.example.newsapp.adapter.NewsAdapter
 import com.example.newsapp.api.HealthNewsApi
 import com.example.newsapp.data.Article
@@ -77,5 +76,17 @@ class Health : Fragment(), NewsAdapter.OnItemClickListener {
     override fun onItemClick(article: Article) {
 //        val action = HealthDirections.actionHealth2ToFullNewsFragment(article)
 //        findNavController().navigate(action)
+
+        try {
+            val navController = findNavController()
+
+            Log.d("BusinessFragment", "Item clicked: ${article.title}")
+            Log.d("BusinessFragment", "NavController: $navController")
+
+            val action = HealthDirections.actionHealthToFullNewsFragment(article)
+            navController.navigate(action)
+        } catch (exception: Exception) {
+            Log.e("BusinessFragment", "Error navigating to FullNewsFragment", exception)
+        }
     }
 }
