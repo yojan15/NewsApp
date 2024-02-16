@@ -74,7 +74,19 @@ private lateinit var newsAdapter: NewsAdapter
     }
 
     override fun onItemClick(article: Article) {
-        val action = SportsDirections.actionSports2ToFullNewsFragment(article)
-        findNavController().navigate(action)
+//        val action = SportsDirections.actionSports2ToFullNewsFragment(article)
+//        findNavController().navigate(action)
+
+        try {
+            val navController = findNavController()
+
+            Log.d("BusinessFragment", "Item clicked: ${article.title}")
+            Log.d("BusinessFragment", "NavController: $navController")
+
+            val action = SportsDirections.actionSportsToFullNewsFragment(article)
+            navController.navigate(action)
+        } catch (exception: Exception) {
+            Log.e("BusinessFragment", "Error navigating to FullNewsFragment", exception)
+        }
     }
 }

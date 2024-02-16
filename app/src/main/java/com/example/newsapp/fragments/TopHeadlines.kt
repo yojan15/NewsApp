@@ -53,13 +53,12 @@ class TopHeadlines : Fragment() , NewsAdapter.OnItemClickListener {
                         Log.d("MainActivity", "Response code: ${response.code()}")
                         Log.d("MainActivity", "Number of articles: ${articles.size}")
 
-                        newsAdapter.submitList(articles) // Update the adapter with the new list
+                        newsAdapter.submitList(articles) // yh upadate karega with new list of article
                     } else {
                         Log.e("MainActivity", "News response is null")
                     }
                 } else {
                     Log.e("MainActivity", "Error: ${response.message()}")
-                    // Additional logging for debugging
                     Log.e("MainActivity", "Error Body: ${response.errorBody()?.string()}")
                 }
             }

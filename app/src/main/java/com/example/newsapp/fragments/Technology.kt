@@ -71,7 +71,19 @@ class Technology : Fragment() , NewsAdapter.OnItemClickListener {
         })
     }
     override fun onItemClick(article: Article) {
-        val action = TechnologyDirections.actionTechnology2ToFullNewsFragment(article)
-        findNavController().navigate(action)
+//        val action = TechnologyDirections.actionTechnology2ToFullNewsFragment(article)
+//        findNavController().navigate(action)
+
+        try {
+            val navController = findNavController()
+
+            Log.d("BusinessFragment", "Item clicked: ${article.title}")
+            Log.d("BusinessFragment", "NavController: $navController")
+
+            val action = TechnologyDirections.actionTechnologyToFullNewsFragment(article)
+            navController.navigate(action)
+        } catch (exception: Exception) {
+            Log.e("BusinessFragment", "Error navigating to FullNewsFragment", exception)
+        }
     }
 }

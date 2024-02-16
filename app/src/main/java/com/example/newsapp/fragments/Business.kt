@@ -6,6 +6,8 @@ import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.constraintlayout.widget.ConstraintLayout
+import androidx.navigation.findNavController
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.newsapp.R
@@ -19,6 +21,7 @@ import retrofit2.Callback
 import retrofit2.Response
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
+
     
 class Business : Fragment() , NewsAdapter.OnItemClickListener {
     private lateinit var binding : FragmentBusinessBinding
@@ -71,8 +74,16 @@ class Business : Fragment() , NewsAdapter.OnItemClickListener {
         })
     }
     override fun onItemClick(article: Article) {
-//        findNavController().navigate(R.id.action_business2_to_fullNewsFragment)
-        val action = BusinessDirections.actionBusiness2ToFullNewsFragment(article)
-        findNavController().navigate(action)
+        try {
+            val navController = findNavController()
+
+            Log.d("BusinessFragment", "Item clicked: ${article.title}")
+            Log.d("BusinessFragment", "NavController: $navController")
+
+            val action = BusinessDirections.actionBusinessToFullNewsFragment(article)
+            navController.navigate(action)
+        } catch (exception: Exception) {
+            Log.e("BusinessFragment", "Error navigating to FullNewsFragment", exception)
+        }
     }
 }

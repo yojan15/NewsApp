@@ -19,7 +19,9 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintVertical_bias="0.0"
-        app:navGraph="@navigation/my_nav" />
+        app:navGraph="@navigation/my_nav" >
+
+    </androidx.fragment.app.FragmentContainerView>
 
     <com.google.android.material.floatingactionbutton.FloatingActionButton
         android:id="@+id/floatingActionButton"
@@ -30,6 +32,7 @@
         android:clickable="true"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:srcCompat="@drawable/baseline_local_fire_department_24" />
+        app:srcCompat="@drawable/baseline_local_fire_department_24"
+        android:focusable="true" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

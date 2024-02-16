@@ -75,6 +75,17 @@ class Entertainment : Fragment(), NewsAdapter.OnItemClickListener {
     }
 
     override fun onItemClick(article: Article) {
-     findNavController().navigate(R.id.action_entertainment2_to_fullNewsFragment)
+     //findNavController().navigate(R.id.action_entertainment2_to_fullNewsFragment)
+        try {
+            val navController = findNavController()
+
+            Log.d("BusinessFragment", "Item clicked: ${article.title}")
+            Log.d("BusinessFragment", "NavController: $navController")
+
+            val action = EntertainmentDirections.actionEntertainment2ToFullNewsFragment(article)
+            navController.navigate(action)
+        } catch (exception: Exception) {
+            Log.e("BusinessFragment", "Error navigating to FullNewsFragment", exception)
+        }
     }
 }
