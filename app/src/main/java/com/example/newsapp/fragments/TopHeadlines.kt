@@ -28,7 +28,13 @@ class TopHeadlines : Fragment() , NewsAdapter.OnItemClickListener {
         binding = FragmentTopHeadlinesBinding.inflate(inflater, container, false)
         getNews()
         setupRecyclerView()
+        setupSwipeRefreshLayout()
         return binding.root
+    }
+    private fun setupSwipeRefreshLayout() {
+        binding.topHeadlinesSwipeRefreshLayout.setOnRefreshListener {
+            getNews()
+        }
     }
     private fun setupRecyclerView() {
         newsAdapter = NewsAdapter(this)
@@ -41,7 +47,8 @@ class TopHeadlines : Fragment() , NewsAdapter.OnItemClickListener {
             .baseUrl("https://newsapi.org/v2/")
             .build()
             .create(NewsApi::class.java)
-
+        binding.topHeadlinesSwipeRefreshLayout.isRefreshing = false // if we use true then it will not stop
+                                                                    // the refreshing animation until the data is fetched
         val retrofitData = retrofitBuilder.getNews()
         retrofitData.enqueue(object : Callback<News> {
             override fun onResponse(call: Call<News>, response: Response<News>) {

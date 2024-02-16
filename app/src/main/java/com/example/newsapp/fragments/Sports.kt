@@ -30,7 +30,13 @@ private lateinit var newsAdapter: NewsAdapter
         binding = FragmentSportsBinding.inflate(inflater, container, false)
         getNews()
         setupRecyclerView()
+        setupSwipeRefreshLayout()
         return binding.root
+    }
+    private fun setupSwipeRefreshLayout() {
+        binding.sportsSwipeRefreshLayout.setOnRefreshListener {
+            getNews()
+        }
     }
     private fun setupRecyclerView() {
         newsAdapter = NewsAdapter(this)
@@ -43,6 +49,8 @@ private lateinit var newsAdapter: NewsAdapter
             .baseUrl("https://newsapi.org/v2/")
             .build()
             .create(SportsNewsApi::class.java)
+
+        binding.sportsSwipeRefreshLayout.isRefreshing = false
 
         val retrofitData = retrofitBuilder.getNews()
         retrofitData.enqueue(object : Callback<News> {

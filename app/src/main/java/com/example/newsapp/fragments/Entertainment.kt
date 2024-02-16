@@ -32,7 +32,14 @@ class Entertainment : Fragment(), NewsAdapter.OnItemClickListener {
         binding = FragmentEntertainmentBinding.inflate(inflater, container, false)
         getNews()
         setupRecyclerView()
+        setupSwipeRefreshLayout()
         return binding.root
+    }
+
+    private fun setupSwipeRefreshLayout() {
+        binding.entertainmentSwiperRefreshLayout.setOnRefreshListener {
+            getNews()
+        }
     }
     private fun setupRecyclerView() {
         newsAdapter = NewsAdapter(this)
@@ -45,6 +52,7 @@ class Entertainment : Fragment(), NewsAdapter.OnItemClickListener {
             .baseUrl("https://newsapi.org/v2/")
             .build()
             .create(EntertainmentNewApi::class.java)
+        binding.entertainmentSwiperRefreshLayout.isRefreshing = false
 
         val retrofitData = retrofitBuilder.getNews()
         retrofitData.enqueue(object : Callback<News> {

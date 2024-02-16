@@ -30,7 +30,14 @@ class Business : Fragment() , NewsAdapter.OnItemClickListener {
         binding = FragmentBusinessBinding.inflate(inflater, container, false)
         getNews()
         setupRecyclerView()
+        setupSwipeRefreshLayout()
         return binding.root
+    }
+
+    private fun setupSwipeRefreshLayout() {
+        binding.swipeRefreshLayout.setOnRefreshListener {
+            getNews()
+        }
     }
     private fun setupRecyclerView() {
         newsAdapter = NewsAdapter(this)
@@ -43,6 +50,9 @@ class Business : Fragment() , NewsAdapter.OnItemClickListener {
             .baseUrl("https://newsapi.org/v2/")
             .build()
             .create(BusinessNewsApi::class.java)
+
+        binding.swipeRefreshLayout.isRefreshing = false
+       // Toast.makeText(requireContext(),"",Toast.LENGTH_SHORT).show()
 
         val retrofitData = retrofitBuilder.getNews()
         retrofitData.enqueue(object : Callback<News> {
