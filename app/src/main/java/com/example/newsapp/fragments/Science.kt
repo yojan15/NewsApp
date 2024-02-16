@@ -31,9 +31,15 @@ class Science : Fragment(), NewsAdapter.OnItemClickListener {
         binding = FragmentScienceBinding.inflate(inflater, container, false)
         getNews()
         setupRecyclerView()
+        setupSwipeRefreshLayout()
         return binding.root
     }
 
+    private fun setupSwipeRefreshLayout() {
+        binding.scienceSwipeRefreshLayout.setOnRefreshListener {
+            getNews()
+        }
+    }
     private fun setupRecyclerView() {
         newsAdapter = NewsAdapter(this)
         binding.scienceRecyclerView.adapter = newsAdapter
@@ -46,6 +52,7 @@ class Science : Fragment(), NewsAdapter.OnItemClickListener {
             .baseUrl("https://newsapi.org/v2/")
             .build()
             .create(ScienceNewsApi::class.java)
+        binding.scienceSwipeRefreshLayout.isRefreshing = false
 
         val retrofitData = retrofitBuilder.getNews()
         retrofitData.enqueue(object : Callback<News> {

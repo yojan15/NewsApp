@@ -6,11 +6,8 @@ import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.constraintlayout.widget.ConstraintLayout
-import androidx.navigation.findNavController
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
-import com.example.newsapp.R
 import com.example.newsapp.adapter.NewsAdapter
 import com.example.newsapp.api.BusinessNewsApi
 import com.example.newsapp.data.Article
@@ -33,7 +30,14 @@ class Business : Fragment() , NewsAdapter.OnItemClickListener {
         binding = FragmentBusinessBinding.inflate(inflater, container, false)
         getNews()
         setupRecyclerView()
+        setupSwipeRefreshLayout()
         return binding.root
+    }
+
+    private fun setupSwipeRefreshLayout() {
+        binding.swipeRefreshLayout.setOnRefreshListener {
+            getNews()
+        }
     }
     private fun setupRecyclerView() {
         newsAdapter = NewsAdapter(this)
@@ -46,6 +50,9 @@ class Business : Fragment() , NewsAdapter.OnItemClickListener {
             .baseUrl("https://newsapi.org/v2/")
             .build()
             .create(BusinessNewsApi::class.java)
+
+        binding.swipeRefreshLayout.isRefreshing = false
+       // Toast.makeText(requireContext(),"",Toast.LENGTH_SHORT).show()
 
         val retrofitData = retrofitBuilder.getNews()
         retrofitData.enqueue(object : Callback<News> {
