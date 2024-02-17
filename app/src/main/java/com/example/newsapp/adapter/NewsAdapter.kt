@@ -5,6 +5,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.TextView
+import androidx.core.content.contentValuesOf
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
@@ -32,6 +33,7 @@ class NewsAdapter(private val onItemClickListener: OnItemClickListener) :
         private val descriptionTextView: TextView = itemView.findViewById(R.id.descriptionTextView)
         private val authorTextView: TextView = itemView.findViewById(R.id.authorTextView)
         private val publishedDate : TextView = itemView.findViewById(R.id.publishDate)
+      //  private val fullContent : TextView = itemView.findViewById(R.id.fullContent)
 
         init {
             itemView.setOnClickListener(this)
@@ -47,6 +49,7 @@ class NewsAdapter(private val onItemClickListener: OnItemClickListener) :
             descriptionTextView.text = article.description
             authorTextView.text = article.author
             publishedDate.text = article.publishedAt
+           // fullContent.text = article.content
         }
         override fun onClick(v: View?) {
             val position = adapterPosition
