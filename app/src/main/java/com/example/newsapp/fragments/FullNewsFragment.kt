@@ -1,5 +1,7 @@
 package com.example.newsapp.fragments
 
+import android.content.Intent
+import android.net.Uri
 import android.os.Bundle
 import android.util.Log
 import androidx.fragment.app.Fragment
@@ -23,6 +25,10 @@ class FullNewsFragment : Fragment(){
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
+        binding.fullNewsSwipeRefreshLayout.setOnRefreshListener {
+                loadWebPage()
+        }
+
         val selectedArticle = arguments?.getParcelable<Article>("selectedArticle")
 
         selectedArticle?.let { article ->
@@ -33,8 +39,27 @@ class FullNewsFragment : Fragment(){
                 .load(article.urlToImage)
                 .placeholder(R.drawable.placeholder_image)
                 .into(binding.fullNewsImageView)
+
+            loadWebPage()
+//            binding.fullNewsUrl.text = article.url
+//            binding.fullNewsUrl.setOnClickListener {
+//                openWebPage(article.url)
+//            }
         } ?: run {
            Log.e("FullNewsFragment","Null")
         }
+    }
+    private fun loadWebPage() {
+        val selectedArticle = arguments?.getParcelable<Article>("selectedArticle")
+        selectedArticle?.url?.let { url ->
+            binding.webView.loadUrl(url)
+//            val intent = Intent(Intent.ACTION_VIEW, Uri.parse(url))
+//            startActivity(intent)
+        }
+        binding.fullNewsSwipeRefreshLayout.isRefreshing = false
+    }
+    private fun openWebPage(url : String) {
+        val intent = Intent(Intent.ACTION_VIEW, Uri.parse(url))
+        startActivity(intent)
     }
 }
