@@ -20,7 +20,7 @@ class MainActivity : AppCompatActivity() {
         setContentView(binding.root)
 
         supportActionBar?.title = "News"
-        //supportActionBar?.setDisplayHomeAsUpEnabled(true)
+//        supportActionBar?.setDisplayHomeAsUpEnabled(true)
         checkAndShowPopupMenu()
     }
     private fun checkAndShowPopupMenu() {
