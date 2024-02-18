@@ -47,7 +47,7 @@ class NewsAdapter(private val onItemClickListener: OnItemClickListener) :
             titleTextView.text = article.title
             descriptionTextView.text = article.description
             authorTextView.text = article.author
-           // publishedDate.text = article.publishedAt
+//            publishedDate.text = article.publishedAt
            // fullContent.text = article.content
         }
         override fun onClick(v: View?) {
