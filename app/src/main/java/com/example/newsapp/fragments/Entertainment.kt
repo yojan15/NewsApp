@@ -6,6 +6,9 @@ import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Toast
+import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.newsapp.R
@@ -14,6 +17,8 @@ import com.example.newsapp.api.EntertainmentNewApi
 import com.example.newsapp.data.Article
 import com.example.newsapp.data.News
 import com.example.newsapp.databinding.FragmentEntertainmentBinding
+import com.example.newsapp.viewModel.ArticleViewModel
+import kotlinx.coroutines.launch
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
@@ -23,6 +28,7 @@ import retrofit2.converter.gson.GsonConverterFactory
 class Entertainment : Fragment(), NewsAdapter.OnItemClickListener {
     private lateinit var binding : FragmentEntertainmentBinding
     private lateinit var newsAdapter: NewsAdapter
+    private lateinit var articleViewModel: ArticleViewModel
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -30,8 +36,9 @@ class Entertainment : Fragment(), NewsAdapter.OnItemClickListener {
     ): View {
         // Inflate the layout for this fragment
         binding = FragmentEntertainmentBinding.inflate(inflater, container, false)
-        getNews()
         setupRecyclerView()
+        articleViewModel = ViewModelProvider(this).get(ArticleViewModel::class.java)
+        getNews()
         setupSwipeRefreshLayout()
         return binding.root
     }
@@ -82,18 +89,33 @@ class Entertainment : Fragment(), NewsAdapter.OnItemClickListener {
         })
     }
 
-    override fun onItemClick(article: Article) {
-     //findNavController().navigate(R.id.action_entertainment2_to_fullNewsFragment)
-        try {
-            val navController = findNavController()
+    override fun onTitleClick(article: Article) {
+        lifecycleScope.launch {
+            val isSavedLiveData = articleViewModel.isArticleSaved(article.url)
 
-            Log.d("BusinessFragment", "Item clicked: ${article.title}")
-            Log.d("BusinessFragment", "NavController: $navController")
+            // Observe the LiveData to get the value
+            isSavedLiveData.observe(requireActivity()) { isSaved ->
+                if (isSaved != null) {
+                    if (isSaved) {
+                        articleViewModel.delete(article)
+                        Toast.makeText(requireContext(), "Article removed from saved list", Toast.LENGTH_SHORT).show()
+                    } else {
+                        articleViewModel.insert(article)
+                        Toast.makeText(requireContext(), "Article saved", Toast.LENGTH_SHORT).show()
+                    }
+                } else {
+                    // Handle the case when isArticleSaved LiveData is null
+                    Toast.makeText(requireContext(), "Error determining article status", Toast.LENGTH_SHORT).show()
+                }
 
-            val action = EntertainmentDirections.actionEntertainment2ToFullNewsFragment(article)
-            navController.navigate(action)
-        } catch (exception: Exception) {
-            Log.e("BusinessFragment", "Error navigating to FullNewsFragment", exception)
+                // Remove the observer to prevent multiple callbacks
+                isSavedLiveData.removeObservers(requireActivity())
+            }
         }
+    }
+
+    override fun onImageOrDescriptionClick(article: Article) {
+        val action = EntertainmentDirections.actionEntertainment2ToFullNewsFragment(article)
+        findNavController().navigate(action)
     }
 }
