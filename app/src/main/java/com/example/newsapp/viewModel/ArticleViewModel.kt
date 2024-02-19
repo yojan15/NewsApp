@@ -4,13 +4,14 @@ import android.app.Application
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.viewModelScope
+import com.example.newsapp.data.AppDatabase
 import com.example.newsapp.data.Article
 import com.example.newsapp.repository.ArticleRepository
 import kotlinx.coroutines.launch
 
 class ArticleViewModel (application: Application) : AndroidViewModel(application) {
     private val repository: ArticleRepository
-    val allArticle: LiveData<List<Article>>
+    private val allArticle: LiveData<List<Article>>
 
     init {
         val articleDao = AppDatabase.getDatabase(application).articleDao()
