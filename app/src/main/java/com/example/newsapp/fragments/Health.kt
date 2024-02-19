@@ -1,11 +1,15 @@
 package com.example.newsapp.fragments
 
 import android.os.Bundle
+import android.provider.SyncStateContract.Helpers
 import android.util.Log
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Toast
+import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.newsapp.adapter.NewsAdapter
@@ -13,6 +17,8 @@ import com.example.newsapp.api.HealthNewsApi
 import com.example.newsapp.data.Article
 import com.example.newsapp.data.News
 import com.example.newsapp.databinding.FragmentHealthBinding
+import com.example.newsapp.viewModel.ArticleViewModel
+import kotlinx.coroutines.launch
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
@@ -22,14 +28,15 @@ import retrofit2.converter.gson.GsonConverterFactory
 class Health : Fragment(), NewsAdapter.OnItemClickListener {
     private lateinit var binding : FragmentHealthBinding
     private lateinit var newsAdapter: NewsAdapter
+    private lateinit var articleViewModel: ArticleViewModel
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
         // Inflate the layout for this fragment
         binding = FragmentHealthBinding.inflate(inflater, container, false)
-        getNews()
         setupRecyclerView()
+        articleViewModel = ViewModelProvider(this).get(ArticleViewModel::class.java)
         setupSwipeRefresh()
         return binding.root
     }
@@ -80,21 +87,33 @@ class Health : Fragment(), NewsAdapter.OnItemClickListener {
 
         })
     }
+    override fun onTitleClick(article: Article) {
+        lifecycleScope.launch {
+            val isSavedLiveData = articleViewModel.isArticleSaved(article.url)
 
-    override fun onItemClick(article: Article) {
-//        val action = HealthDirections.actionHealth2ToFullNewsFragment(article)
-//        findNavController().navigate(action)
+            // Observe the LiveData to get the value
+            isSavedLiveData.observe(requireActivity()) { isSaved ->
+                if (isSaved != null) {
+                    if (isSaved) {
+                        articleViewModel.delete(article)
+                        Toast.makeText(requireContext(), "Article removed from saved list", Toast.LENGTH_SHORT).show()
+                    } else {
+                        articleViewModel.insert(article)
+                        Toast.makeText(requireContext(), "Article saved", Toast.LENGTH_SHORT).show()
+                    }
+                } else {
+                    // Handle the case when isArticleSaved LiveData is null
+                    Toast.makeText(requireContext(), "Error determining article status", Toast.LENGTH_SHORT).show()
+                }
 
-        try {
-            val navController = findNavController()
-
-            Log.d("BusinessFragment", "Item clicked: ${article.title}")
-            Log.d("BusinessFragment", "NavController: $navController")
-
-            val action = HealthDirections.actionHealthToFullNewsFragment(article)
-            navController.navigate(action)
-        } catch (exception: Exception) {
-            Log.e("BusinessFragment", "Error navigating to FullNewsFragment", exception)
+                // Remove the observer to prevent multiple callbacks
+                isSavedLiveData.removeObservers(requireActivity())
+            }
         }
+    }
+
+    override fun onImageOrDescriptionClick(article: Article) {
+        val action = HealthDirections.actionHealthToFullNewsFragment(article)
+        findNavController().navigate(action)
     }
 }
