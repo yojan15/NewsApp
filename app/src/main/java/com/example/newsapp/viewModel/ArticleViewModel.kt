@@ -11,7 +11,7 @@ import kotlinx.coroutines.launch
 
 class ArticleViewModel (application: Application) : AndroidViewModel(application) {
     private val repository: ArticleRepository
-    private val allArticle: LiveData<List<Article>>
+    val allArticle: LiveData<List<Article>>
 
     init {
         val articleDao = AppDatabase.getDatabase(application).articleDao()
