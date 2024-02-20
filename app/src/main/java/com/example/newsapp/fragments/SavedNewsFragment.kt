@@ -12,7 +12,6 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
-import com.example.newsapp.R
 import com.example.newsapp.adapter.NewsAdapter
 import com.example.newsapp.data.Article
 import com.example.newsapp.databinding.FragmentSavedNewsBinding
@@ -73,7 +72,6 @@ class SavedNewsFragment : Fragment() , NewsAdapter.OnItemClickListener {
             }
         }
     }
-
     override fun onImageOrDescriptionClick(article: Article) {
         val action = SavedNewsFragmentDirections.actionSavedNewsFragmentToFullNewsFragment(article)
         findNavController().navigate(action)

@@ -63,7 +63,6 @@ class TopHeadlines : Fragment() , NewsAdapter.OnItemClickListener {
                     val newsResponse = response.body()
                     if (newsResponse != null) {
                         val articles = newsResponse.articles
-
                         Log.d("MainActivity", "Response code: ${response.code()}")
                         Log.d("MainActivity", "Number of articles: ${articles.size}")
 
