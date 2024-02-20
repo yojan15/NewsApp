@@ -8,8 +8,10 @@ import android.os.Bundle
 import android.view.View
 import android.widget.PopupMenu
 import androidx.appcompat.app.AlertDialog
+import androidx.fragment.app.FragmentTransaction
 import androidx.navigation.findNavController
 import com.example.newsapp.databinding.ActivityMainBinding
+import com.example.newsapp.fragments.SavedNewsFragment
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 
 class MainActivity : AppCompatActivity() {
@@ -20,8 +22,17 @@ class MainActivity : AppCompatActivity() {
         setContentView(binding.root)
 
         supportActionBar?.title = "News"
-        //supportActionBar?.setDisplayHomeAsUpEnabled(true)
+//        supportActionBar?.setDisplayHomeAsUpEnabled(true)
         checkAndShowPopupMenu()
+
+        binding.ViewAllSavedNews.setOnClickListener {
+            val fragment = SavedNewsFragment()
+            supportFragmentManager.beginTransaction()
+                .replace(R.id.fragmentContainerView,fragment)
+                .addToBackStack(null)
+                .setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN)
+                .commit()
+        }
     }
     private fun checkAndShowPopupMenu() {
         if (isNetworkConnected()) {

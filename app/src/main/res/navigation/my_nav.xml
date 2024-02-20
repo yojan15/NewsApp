@@ -114,5 +114,18 @@
                 app:argType="com.example.newsapp.data.Article" />
         </action>
     </fragment>
+    <fragment
+        android:id="@+id/savedNewsFragment"
+        android:name="com.example.newsapp.fragments.SavedNewsFragment"
+        android:label="fragment_saved_news"
+        tools:layout="@layout/fragment_saved_news" >
+        <action
+            android:id="@+id/action_savedNewsFragment_to_fullNewsFragment"
+            app:destination="@id/fullNewsFragment">
+            <argument
+                android:name="selectedArticle"
+                app:argType="com.example.newsapp.data.Article" />
+        </action>
+    </fragment>
 
 </navigation>
