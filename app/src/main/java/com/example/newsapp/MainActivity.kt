@@ -8,6 +8,7 @@ import android.os.Bundle
 import android.view.View
 import android.widget.PopupMenu
 import androidx.appcompat.app.AlertDialog
+import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentTransaction
 import androidx.navigation.findNavController
 import com.example.newsapp.databinding.ActivityMainBinding
@@ -107,10 +108,10 @@ class MainActivity : AppCompatActivity() {
             .setCancelable(false)
             .show()
     }
-//    private fun openFragment(fragment: Fragment) {
-//        supportFragmentManager.beginTransaction()
-//            .replace(R.id.fragmentContainerView, fragment)
-//            .addToBackStack(null)
-//            .commit()
-//    }
+    private fun openFragment(fragment: Fragment) {
+        supportFragmentManager.beginTransaction()
+            .replace(R.id.fragmentContainerView, fragment)
+            .addToBackStack(null)
+            .commit()
+    }
 }

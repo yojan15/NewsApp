@@ -7,12 +7,10 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
-import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
-import com.example.newsapp.R
 import com.example.newsapp.adapter.NewsAdapter
 import com.example.newsapp.data.Article
 import com.example.newsapp.databinding.FragmentSavedNewsBinding
@@ -34,19 +32,17 @@ class SavedNewsFragment : Fragment() , NewsAdapter.OnItemClickListener {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         Log.d("SavedNewsFragment", "onViewCreated invoked")
         super.onViewCreated(view, savedInstanceState)
-        articleViewModel = ViewModelProvider(this).get(ArticleViewModel::class.java)
+        articleViewModel = ViewModelProvider(this)[ArticleViewModel::class.java]
         newsAdapter = NewsAdapter(this)
         binding.recyclerviewSavedNews.apply {
             layoutManager = LinearLayoutManager(context)
             adapter = newsAdapter
         }
-        articleViewModel.allArticle.observe(viewLifecycleOwner, Observer { articles ->
+        articleViewModel.allArticle.observe(viewLifecycleOwner) { articles ->
             Log.d("SavedNewsFragment", "Number of saved articles: ${articles.size}")
             displaySaved(articles)
-        })
-
+        }
     }
-
     private fun displaySaved(articles: List<Article>?) {
         newsAdapter.submitList(articles)
     }
@@ -73,9 +69,8 @@ class SavedNewsFragment : Fragment() , NewsAdapter.OnItemClickListener {
             }
         }
     }
-
     override fun onImageOrDescriptionClick(article: Article) {
-        val action = SavedNewsFragmentDirections.actionSavedNewsFragmentToFullNewsFragment(article)
+       val action = SavedNewsFragmentDirections.actionSavedNewsFragmentToFullNewsFragment(article)
         findNavController().navigate(action)
     }
 }
