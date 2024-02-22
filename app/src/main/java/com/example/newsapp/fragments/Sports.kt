@@ -68,21 +68,21 @@ private lateinit var articleViewModel: ArticleViewModel
                     if (newsResponse != null) {
                         val articles = newsResponse.articles
 
-                        Log.d("MainActivity", "Response code: ${response.code()}")
-                        Log.d("MainActivity", "Number of articles: ${articles.size}")
+                        Log.d("com.example.newsapp.MainActivity", "Response code: ${response.code()}")
+                        Log.d("com.example.newsapp.MainActivity", "Number of articles: ${articles.size}")
 
                         newsAdapter.submitList(articles) // Update the adapter with the new list
                     } else {
-                        Log.e("MainActivity", "News response is null")
+                        Log.e("com.example.newsapp.MainActivity", "News response is null")
                     }
                 } else {
-                    Log.e("MainActivity", "Error: ${response.message()}")
+                    Log.e("com.example.newsapp.MainActivity", "Error: ${response.message()}")
 
-                    Log.e("MainActivity", "Error Body: ${response.errorBody()?.string()}")
+                    Log.e("com.example.newsapp.MainActivity", "Error Body: ${response.errorBody()?.string()}")
                 }
             }
             override fun onFailure(call: Call<News>, t: Throwable) {
-                Log.e("MainActivity", "Failed to get news", t)
+                Log.e("com.example.newsapp.MainActivity", "Failed to get news", t)
             }
 
         })

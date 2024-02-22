@@ -15,6 +15,7 @@ import com.example.newsapp.adapter.NewsAdapter
 import com.example.newsapp.api.NewsApi
 import com.example.newsapp.data.Article
 import com.example.newsapp.data.News
+import com.example.newsapp.data.toArticle
 import com.example.newsapp.databinding.FragmentTopHeadlinesBinding
 import com.example.newsapp.viewModel.ArticleViewModel
 import kotlinx.coroutines.launch
@@ -34,6 +35,10 @@ class TopHeadlines : Fragment() , NewsAdapter.OnItemClickListener {
         binding = FragmentTopHeadlinesBinding.inflate(inflater, container, false)
         setupRecyclerView()
         articleViewModel = ViewModelProvider(this).get(ArticleViewModel::class.java)
+
+        articleViewModel.allCachedArticles.observe(viewLifecycleOwner) { cachedArticle ->
+            newsAdapter.submitList(cachedArticle.map { it.toArticle()})
+        }
         getNews()
         setupSwipeRefreshLayout()
         return binding.root
@@ -59,6 +64,7 @@ class TopHeadlines : Fragment() , NewsAdapter.OnItemClickListener {
         val retrofitData = retrofitBuilder.getNews()
         retrofitData.enqueue(object : Callback<News> {
             override fun onResponse(call: Call<News>, response: Response<News>) {
+
                 if (response.isSuccessful) {
                     val newsResponse = response.body()
                     if (newsResponse != null) {
@@ -68,6 +74,13 @@ class TopHeadlines : Fragment() , NewsAdapter.OnItemClickListener {
                         Log.d("MainActivity", "Number of articles: ${articles.size}")
 
                         newsAdapter.submitList(articles) // yh upadate karega with new list of article
+
+                        articles.forEach {article ->
+                            lifecycleScope.launch {
+                                articleViewModel.insert(article)
+                            }
+                        }
+
                     } else {
                         Log.e("MainActivity", "News response is null")
                     }
@@ -81,7 +94,6 @@ class TopHeadlines : Fragment() , NewsAdapter.OnItemClickListener {
             }
         })
     }
-
     override fun onTitleClick(article: Article) {
         lifecycleScope.launch {
             val isSavedLiveData = articleViewModel.isArticleSaved(article.url)
@@ -105,7 +117,6 @@ class TopHeadlines : Fragment() , NewsAdapter.OnItemClickListener {
             }
         }
     }
-
     override fun onImageOrDescriptionClick(article: Article) {
         val action = TopHeadlinesDirections.actionTopHeadlinesToFullNewsFragment(article)
         findNavController().navigate(action)

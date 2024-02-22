@@ -19,4 +19,16 @@ interface ArticleDao {
     fun getAllArticle() : LiveData<List<Article>>
     @Query("SELECT EXISTS (SELECT 1 FROM ARTICLE WHERE url = :url)")
     fun isArticleSaved(url:String) : LiveData<Boolean>
+
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    suspend fun insertCachedArticle(article: CachedArticle)
+
+    @Query("SELECT * FROM cached_articles WHERE url = :url")
+    fun getCachedArticle(url: String): LiveData<CachedArticle?>
+
+    @Query("SELECT * FROM cached_articles")
+    fun getAllCachedArticles(): LiveData<List<CachedArticle>>
+
+    @Delete
+    fun deleteCachedArticle(article: Article)
 }

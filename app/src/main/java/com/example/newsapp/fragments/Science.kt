@@ -68,21 +68,21 @@ class Science : Fragment(), NewsAdapter.OnItemClickListener {
                     if(newsResponse != null) {
                         val articles = newsResponse.articles
 
-                        Log.e("MainActivity","Response code : ${response.code()}")
-                        Log.e("MainActivity","Number of articles : ${articles.size}")
+                        Log.e("com.example.newsapp.MainActivity","Response code : ${response.code()}")
+                        Log.e("com.example.newsapp.MainActivity","Number of articles : ${articles.size}")
 
                         newsAdapter.submitList(articles)
                     } else {
-                        Log.e("MainActivity", "news response is null")
+                        Log.e("com.example.newsapp.MainActivity", "news response is null")
                     }
                 } else {
-                    Log.e("MainActivity","Error ${response.message()}")
-                    Log.e("MainActivity","Error body ${response.errorBody()}")
+                    Log.e("com.example.newsapp.MainActivity","Error ${response.message()}")
+                    Log.e("com.example.newsapp.MainActivity","Error body ${response.errorBody()}")
                 }
             }
 
             override fun onFailure(call: Call<News>, t: Throwable) {
-                Log.e("MainActivity","$t")
+                Log.e("com.example.newsapp.MainActivity","$t")
             }
 
         })

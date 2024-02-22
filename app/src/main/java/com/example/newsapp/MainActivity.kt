@@ -1,14 +1,9 @@
 package com.example.newsapp
 
-import android.content.Context
-import android.net.ConnectivityManager
-import android.net.NetworkCapabilities
-import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.view.View
-import android.widget.PopupMenu
-import androidx.appcompat.app.AlertDialog
-import androidx.fragment.app.Fragment
+import androidx.appcompat.app.AppCompatActivity
+import androidx.appcompat.widget.PopupMenu
 import androidx.fragment.app.FragmentTransaction
 import androidx.navigation.findNavController
 import com.example.newsapp.databinding.ActivityMainBinding
@@ -24,7 +19,6 @@ class MainActivity : AppCompatActivity() {
 
         supportActionBar?.title = "News"
 //        supportActionBar?.setDisplayHomeAsUpEnabled(true)
-        checkAndShowPopupMenu()
 
         binding.ViewAllSavedNews.setOnClickListener {
             val fragment = SavedNewsFragment()
@@ -34,26 +28,13 @@ class MainActivity : AppCompatActivity() {
                 .setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN)
                 .commit()
         }
-    }
-    private fun checkAndShowPopupMenu() {
-        if (isNetworkConnected()) {
-            val fab: FloatingActionButton = binding.floatingActionButton
-            fab.setOnClickListener {
-                showPopupMenu(fab)
-            }
-        } else {
-            showNoInternetDialog()
+
+        val fab: FloatingActionButton = binding.floatingActionButton
+        fab.setOnClickListener {
+            showPopupMenu(fab)
         }
     }
-    private fun isNetworkConnected(): Boolean {
-        val connectivityManager =
-            getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
-        val network = connectivityManager.activeNetwork
-        val networkCapabilities = connectivityManager.getNetworkCapabilities(network)
-        return networkCapabilities != null &&
-                (networkCapabilities.hasTransport(NetworkCapabilities.TRANSPORT_WIFI) ||
-                        networkCapabilities.hasTransport(NetworkCapabilities.TRANSPORT_CELLULAR))
-    }
+
     private fun showPopupMenu(view: View) {
         val popupMenu = PopupMenu(this, view)
         popupMenu.inflate(R.menu.menu_fab)
@@ -94,24 +75,5 @@ class MainActivity : AppCompatActivity() {
             }
         }
         popupMenu.show()
-    }
-    private fun showNoInternetDialog() {
-        val builder = AlertDialog.Builder(this)
-        builder.setTitle("No Internet Connection")
-            .setMessage("Please check your internet connection and try again.")
-            .setPositiveButton("Retry") { _, _ ->
-                checkAndShowPopupMenu()
-            }
-            .setNegativeButton("Exit") { _, _ ->
-                finishAffinity()
-            }
-            .setCancelable(false)
-            .show()
-    }
-    private fun openFragment(fragment: Fragment) {
-        supportFragmentManager.beginTransaction()
-            .replace(R.id.fragmentContainerView, fragment)
-            .addToBackStack(null)
-            .commit()
     }
 }

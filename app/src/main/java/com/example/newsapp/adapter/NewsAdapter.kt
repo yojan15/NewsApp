@@ -61,7 +61,7 @@ class NewsAdapter(private val onItemListener: OnItemClickListener) :
             titleTextView.setTextColor(
                 ContextCompat.getColor(
                     itemView.context,
-                    if (isTitleClicked) R.color.blue else R.color.black
+                    if (isTitleClicked) R.color.blue else R.color.grey
                 )
             )
 
@@ -79,7 +79,7 @@ class NewsAdapter(private val onItemListener: OnItemClickListener) :
                         titleTextView.setTextColor(
                             ContextCompat.getColor(
                                 itemView.context,
-                                if (isTitleClicked) R.color.blue else R.color.black
+                                if (isTitleClicked) R.color.blue else R.color.grey
                             )
                         )
                         onItemListener.onTitleClick(getItem(position))

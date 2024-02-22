@@ -6,6 +6,7 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.viewModelScope
 import com.example.newsapp.data.AppDatabase
 import com.example.newsapp.data.Article
+import com.example.newsapp.data.CachedArticle
 import com.example.newsapp.repository.ArticleRepository
 import kotlinx.coroutines.launch
 
@@ -18,6 +19,8 @@ class ArticleViewModel (application: Application) : AndroidViewModel(application
         repository = ArticleRepository(articleDao)
         allArticle = repository.allArticle
     }
+
+    val allCachedArticles: LiveData<List<CachedArticle>> = repository.allCacheArticles
 
     fun insert(article: Article) = viewModelScope.launch {
         repository.insert(article)
