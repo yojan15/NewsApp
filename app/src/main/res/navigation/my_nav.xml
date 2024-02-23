@@ -114,6 +114,7 @@
                 app:argType="com.example.newsapp.data.Article" />
         </action>
     </fragment>
+
     <fragment
         android:id="@+id/savedNewsFragment"
         android:name="com.example.newsapp.fragments.SavedNewsFragment"
@@ -123,8 +124,8 @@
             android:id="@+id/action_savedNewsFragment_to_fullNewsFragment"
             app:destination="@id/fullNewsFragment">
             <argument
-                android:name="selectedArticle"
-                app:argType="com.example.newsapp.data.Article" />
+                android:name="selectArticle"
+                app:argType="com.example.newsapp.data.Article"/>
         </action>
     </fragment>
 

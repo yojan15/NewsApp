@@ -1,5 +1,6 @@
 package com.example.newsapp.fragments
 
+import android.content.Intent
 import android.os.Bundle
 import android.util.Log
 import androidx.fragment.app.Fragment
@@ -12,9 +13,11 @@ import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.newsapp.adapter.NewsAdapter
+import com.example.newsapp.api.NewsApi
 import com.example.newsapp.api.ScienceNewsApi
 import com.example.newsapp.data.Article
 import com.example.newsapp.data.News
+import com.example.newsapp.data.toArticle
 import com.example.newsapp.databinding.FragmentScienceBinding
 import com.example.newsapp.viewModel.ArticleViewModel
 import kotlinx.coroutines.launch
@@ -28,6 +31,7 @@ class Science : Fragment(), NewsAdapter.OnItemClickListener {
     private lateinit var binding : FragmentScienceBinding
     private lateinit var newsAdapter: NewsAdapter
     private lateinit var articleViewModel: ArticleViewModel
+    private var savedArticles = mutableSetOf<String>()
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
@@ -35,83 +39,143 @@ class Science : Fragment(), NewsAdapter.OnItemClickListener {
         // Inflate the layout for this fragment
         binding = FragmentScienceBinding.inflate(inflater, container, false)
         setupRecyclerView()
-        articleViewModel = ViewModelProvider(this).get(ArticleViewModel::class.java)
-        getNews()
+        articleViewModel = ViewModelProvider(this)[ArticleViewModel::class.java]
+
+
+        articleViewModel.allCachedArticles.observe(viewLifecycleOwner) { cachedArticles ->
+            /**
+             * gets all the articles from cacheArticle table when user is not connected to internet
+             */
+            val articles = cachedArticles.map { it.toArticle() }
+            newsAdapter.submitList(articles)
+
+            // Now, observe saved articles and update the list
+            articleViewModel.allArticle.observe(viewLifecycleOwner) { savedArticles ->
+                Log.d("TopHeadlines", "Saved articles: $savedArticles")
+                /**
+                 * gets all the articles from Article table when user is connected to internet
+                 */
+                this.savedArticles.clear()
+                this.savedArticles.addAll(savedArticles.map { it.url })
+            }
+        }
+        getNews()   // calling the function to getNews
         setupSwipeRefreshLayout()
         return binding.root
     }
+
     private fun setupSwipeRefreshLayout() {
         binding.scienceSwipeRefreshLayout.setOnRefreshListener {
+            /**
+             * swipe down to get the latest news
+             */
             getNews()
+
+            articleViewModel.deleteAllCachedArticles()
+            Log.e("cached articles","${articleViewModel.allCachedArticles}")
         }
     }
+
     private fun setupRecyclerView() {
+        /**
+         * set up RecyclerView to get all the article in recyclerView
+         */
         newsAdapter = NewsAdapter(this)
         binding.scienceRecyclerView.adapter = newsAdapter
         binding.scienceRecyclerView.layoutManager = LinearLayoutManager(requireContext())
     }
-
     private fun getNews() {
+        /**
+         * create an instance of a retrofit to call the articles from base url
+         */
         val retrofitBuilder = Retrofit.Builder()
             .addConverterFactory(GsonConverterFactory.create())
             .baseUrl("https://newsapi.org/v2/")
             .build()
             .create(ScienceNewsApi::class.java)
         binding.scienceSwipeRefreshLayout.isRefreshing = false
+        articleViewModel.deleteAllCachedArticles()
+        Log.e("cached articles","${articleViewModel.allCachedArticles}")
 
         val retrofitData = retrofitBuilder.getNews()
         retrofitData.enqueue(object : Callback<News> {
+
             override fun onResponse(call: Call<News>, response: Response<News>) {
-                if(response.isSuccessful) {
+                if (response.isSuccessful) {
                     val newsResponse = response.body()
-                    if(newsResponse != null) {
-                        val articles = newsResponse.articles
+                    if (newsResponse != null) {
+                        val savedArticleUrls = articleViewModel.allArticle.value?.map { it.url } ?: emptyList()
 
-                        Log.e("MainActivity","Response code : ${response.code()}")
-                        Log.e("MainActivity","Number of articles : ${articles.size}")
+                        val newArticles = newsResponse.articles.filter { article ->
+                            article.url !in savedArticleUrls
+                        }
 
-                        newsAdapter.submitList(articles)
+                        Log.d("com.example.newsapp.MainActivity", "Response code: ${response.code()}")
+                        Log.d("com.example.newsapp.MainActivity", "Number of articles: ${newArticles.size}")
+
+                        newArticles.forEach { article ->
+                            lifecycleScope.launch {
+                                val isSaved = articleViewModel.isArticleSaved(article.url).value
+                                if (isSaved != null && isSaved) {
+                                    // Delete all cached articles when a new article is saved
+                                    articleViewModel.deleteAllCachedArticles()
+                                    Toast.makeText(
+                                        requireContext(), "Article removed from saved list", Toast.LENGTH_SHORT
+                                    ).show()
+                                } else {
+                                    articleViewModel.insert(article)
+                                }
+                            }
+                            // Only submit the list of new articles to the adapter
+                            newsAdapter.submitList(newArticles)
+                        }
                     } else {
-                        Log.e("MainActivity", "news response is null")
+                        Log.e("com.example.newsapp.MainActivity", "News response is null")
                     }
                 } else {
-                    Log.e("MainActivity","Error ${response.message()}")
-                    Log.e("MainActivity","Error body ${response.errorBody()}")
+                    Log.e("com.example.newsapp.MainActivity", "Error: ${response.message()}")
+                    Log.e("com.example.newsapp.MainActivity", "Error Body: ${response.errorBody()?.string()}")
                 }
             }
 
             override fun onFailure(call: Call<News>, t: Throwable) {
-                Log.e("MainActivity","$t")
+                Log.e("com.example.newsapp.MainActivity", "Failed to get news", t)
             }
-
         })
     }
     override fun onTitleClick(article: Article) {
         lifecycleScope.launch {
             val isSavedLiveData = articleViewModel.isArticleSaved(article.url)
-
-            // Observe the LiveData to get the value
             isSavedLiveData.observe(requireActivity()) { isSaved ->
                 if (isSaved != null) {
                     if (isSaved) {
                         articleViewModel.delete(article)
-                        Toast.makeText(requireContext(), "Article removed from saved list", Toast.LENGTH_SHORT).show()
+                        Toast.makeText(
+                            requireContext(),
+                            "Article removed from saved list", Toast.LENGTH_SHORT).show()
                     } else {
-                        articleViewModel.insert(article)
+                        articleViewModel.saveArticle(article)
                         Toast.makeText(requireContext(), "Article saved", Toast.LENGTH_SHORT).show()
                     }
                 } else {
-                    // Handle the case when isArticleSaved LiveData is null
-                    Toast.makeText(requireContext(), "Error determining article status", Toast.LENGTH_SHORT).show()
+                    Toast.makeText(
+                        requireContext(),
+                        "Error determining article status", Toast.LENGTH_SHORT).show()
                 }
-
-                // Remove the observer to prevent multiple callbacks
                 isSavedLiveData.removeObservers(requireActivity())
             }
         }
     }
     override fun onImageOrDescriptionClick(article: Article) {
-        val action = ScienceDirections.actionScience2ToFullNewsFragment(article)
+      val action = ScienceDirections.actionScience2ToFullNewsFragment(article)
         findNavController().navigate(action)
+    }
+
+    override fun onTitleLongClick(article: Article, view: View): Boolean {
+        val shareIntent = Intent(Intent.ACTION_SEND)
+        shareIntent.type = "text/plain"
+        shareIntent.putExtra(Intent.EXTRA_TEXT, article.url)
+        startActivity(Intent.createChooser(shareIntent, "Share article URL"))
+        return true
     }
 }

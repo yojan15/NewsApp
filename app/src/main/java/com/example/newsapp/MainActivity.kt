@@ -1,65 +1,88 @@
 package com.example.newsapp
 
-import android.content.Context
-import android.net.ConnectivityManager
-import android.net.NetworkCapabilities
-import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.view.Menu
 import android.view.View
-import android.widget.PopupMenu
-import androidx.appcompat.app.AlertDialog
+import androidx.appcompat.app.AppCompatActivity
+import androidx.appcompat.widget.PopupMenu
+import androidx.appcompat.widget.SearchView
 import androidx.fragment.app.FragmentTransaction
-import androidx.navigation.findNavController
+import androidx.navigation.NavController
+import androidx.navigation.fragment.NavHostFragment
 import com.example.newsapp.databinding.ActivityMainBinding
 import com.example.newsapp.fragments.SavedNewsFragment
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 
 class MainActivity : AppCompatActivity() {
-    private lateinit var binding : ActivityMainBinding
+    private lateinit var binding: ActivityMainBinding
+    private lateinit var navController: NavController
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
         supportActionBar?.title = "News"
-//        supportActionBar?.setDisplayHomeAsUpEnabled(true)
-        checkAndShowPopupMenu()
+
+        // Initialize NavController
+        val navHostFragment =
+            supportFragmentManager.findFragmentById(R.id.fragmentContainerView) as NavHostFragment
+        navController = navHostFragment.navController
 
         binding.ViewAllSavedNews.setOnClickListener {
             val fragment = SavedNewsFragment()
             supportFragmentManager.beginTransaction()
-                .replace(R.id.fragmentContainerView,fragment)
+                .replace(R.id.fragmentContainerView, fragment)
                 .addToBackStack(null)
                 .setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN)
                 .commit()
         }
-    }
-    private fun checkAndShowPopupMenu() {
-        if (isNetworkConnected()) {
-            val fab: FloatingActionButton = binding.floatingActionButton
-            fab.setOnClickListener {
-                showPopupMenu(fab)
+
+        val fab: FloatingActionButton = binding.floatingActionButton
+        fab.setOnClickListener {
+            showPopupMenu(fab)
+        }
+        navController.addOnDestinationChangedListener { _, destination, _ ->
+            supportActionBar?.title = when (destination.id) {
+                R.id.topHeadlines -> "Top Headlines"
+                R.id.business -> "Business"
+                R.id.entertainment -> "Entertainment"
+                R.id.health -> "Health"
+                R.id.sports -> "Sports"
+                R.id.science -> "Science"
+                R.id.technology -> "Technology"
+                R.id.savedNewsFragment -> "Saved News"
+                else -> "News"
             }
-        } else {
-            showNoInternetDialog()
         }
     }
-    private fun isNetworkConnected(): Boolean {
-        val connectivityManager =
-            getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
-        val network = connectivityManager.activeNetwork
-        val networkCapabilities = connectivityManager.getNetworkCapabilities(network)
-        return networkCapabilities != null &&
-                (networkCapabilities.hasTransport(NetworkCapabilities.TRANSPORT_WIFI) ||
-                        networkCapabilities.hasTransport(NetworkCapabilities.TRANSPORT_CELLULAR))
+
+    override fun onCreateOptionsMenu(menu: Menu): Boolean {
+        menuInflater.inflate(R.menu.my_menu, menu)
+
+        val searchItem = menu.findItem(R.id.action_search)
+        val searchView = searchItem?.actionView as SearchView
+
+        searchView.setOnQueryTextListener(object : SearchView.OnQueryTextListener {
+            override fun onQueryTextSubmit(query: String?): Boolean {
+                // Handle the query submission
+                return true
+            }
+
+            override fun onQueryTextChange(newText: String?): Boolean {
+                // Handle the query text change
+                return true
+            }
+        })
+
+        return true
     }
+
     private fun showPopupMenu(view: View) {
         val popupMenu = PopupMenu(this, view)
         popupMenu.inflate(R.menu.menu_fab)
 
         popupMenu.setOnMenuItemClickListener { item ->
-            val navController = findNavController(R.id.fragmentContainerView)
-
             when (item.itemId) {
                 R.id.topHeadlines -> {
                     navController.navigate(R.id.topHeadlines)
@@ -94,23 +117,14 @@ class MainActivity : AppCompatActivity() {
         }
         popupMenu.show()
     }
-    private fun showNoInternetDialog() {
-        val builder = AlertDialog.Builder(this)
-        builder.setTitle("No Internet Connection")
-            .setMessage("Please check your internet connection and try again.")
-            .setPositiveButton("Retry") { _, _ ->
-                checkAndShowPopupMenu()
-            }
-            .setNegativeButton("Exit") { _, _ ->
-                finishAffinity()
-            }
-            .setCancelable(false)
-            .show()
+
+    fun showFab() {
+        binding.floatingActionButton.show()
+        binding.ViewAllSavedNews.show()
     }
-//    private fun openFragment(fragment: Fragment) {
-//        supportFragmentManager.beginTransaction()
-//            .replace(R.id.fragmentContainerView, fragment)
-//            .addToBackStack(null)
-//            .commit()
-//    }
+
+    fun hideFab() {
+        binding.floatingActionButton.hide()
+        binding.ViewAllSavedNews.hide()
+    }
 }
