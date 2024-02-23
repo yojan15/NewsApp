@@ -40,7 +40,6 @@ class Science : Fragment(), NewsAdapter.OnItemClickListener {
         setupSwipeRefreshLayout()
         return binding.root
     }
-
     private fun setupSwipeRefreshLayout() {
         binding.scienceSwipeRefreshLayout.setOnRefreshListener {
             getNews()
@@ -111,7 +110,6 @@ class Science : Fragment(), NewsAdapter.OnItemClickListener {
             }
         }
     }
-
     override fun onImageOrDescriptionClick(article: Article) {
         val action = ScienceDirections.actionScience2ToFullNewsFragment(article)
         findNavController().navigate(action)
