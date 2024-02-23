@@ -24,10 +24,12 @@ import retrofit2.Callback
 import retrofit2.Response
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
-class TopHeadlines : Fragment() , NewsAdapter.OnItemClickListener {
-    private lateinit var binding : FragmentTopHeadlinesBinding
-    private lateinit var newsAdapter : NewsAdapter
+class TopHeadlines : Fragment(), NewsAdapter.OnItemClickListener {
+    private lateinit var binding: FragmentTopHeadlinesBinding
+    private lateinit var newsAdapter: NewsAdapter
     private lateinit var articleViewModel: ArticleViewModel
+    private val savedArticles = mutableSetOf<String>()
+
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
@@ -36,51 +38,75 @@ class TopHeadlines : Fragment() , NewsAdapter.OnItemClickListener {
         setupRecyclerView()
         articleViewModel = ViewModelProvider(this).get(ArticleViewModel::class.java)
 
-        articleViewModel.allCachedArticles.observe(viewLifecycleOwner) { cachedArticle ->
-            newsAdapter.submitList(cachedArticle.map { it.toArticle()})
+        articleViewModel.allCachedArticles.observe(viewLifecycleOwner) { cachedArticles ->
+            val articles = cachedArticles.map { it.toArticle() }
+            newsAdapter.submitList(articles)
+
+            // Now, observe saved articles and update the list
+            articleViewModel.allArticle.observe(viewLifecycleOwner) { savedArticles ->
+                Log.d("TopHeadlines", "Saved articles: $savedArticles")
+                this.savedArticles.clear()
+                this.savedArticles.addAll(savedArticles.map { it.url })
+            }
         }
         getNews()
         setupSwipeRefreshLayout()
         return binding.root
     }
+
     private fun setupSwipeRefreshLayout() {
         binding.topHeadlinesSwipeRefreshLayout.setOnRefreshListener {
             getNews()
         }
     }
+
     private fun setupRecyclerView() {
         newsAdapter = NewsAdapter(this)
         binding.recyclerView.adapter = newsAdapter
         binding.recyclerView.layoutManager = LinearLayoutManager(requireContext())
     }
+
     private fun getNews() {
         val retrofitBuilder = Retrofit.Builder()
             .addConverterFactory(GsonConverterFactory.create())
             .baseUrl("https://newsapi.org/v2/")
             .build()
             .create(NewsApi::class.java)
-        binding.topHeadlinesSwipeRefreshLayout.isRefreshing = false // if we use true then it will not stop
-                                                                    // the refreshing animation until the data is fetched
+        binding.topHeadlinesSwipeRefreshLayout.isRefreshing = false
+
         val retrofitData = retrofitBuilder.getNews()
         retrofitData.enqueue(object : Callback<News> {
-            override fun onResponse(call: Call<News>, response: Response<News>) {
 
+            override fun onResponse(call: Call<News>, response: Response<News>) {
                 if (response.isSuccessful) {
                     val newsResponse = response.body()
                     if (newsResponse != null) {
-                        val articles = newsResponse.articles
+                        val savedArticleUrls = articleViewModel.allArticle.value?.map { it.url } ?: emptyList()
 
-                        Log.d("MainActivity", "Response code: ${response.code()}")
-                        Log.d("MainActivity", "Number of articles: ${articles.size}")
-
-                        newsAdapter.submitList(articles) // yh upadate karega with new list of article
-
-                        articles.forEach {article ->
-                            lifecycleScope.launch {
-                                articleViewModel.insert(article)
-                            }
+                        val newArticles = newsResponse.articles.filter { article ->
+                            article.url !in savedArticleUrls
                         }
 
+                        Log.d("MainActivity", "Response code: ${response.code()}")
+                        Log.d("MainActivity", "Number of articles: ${newArticles.size}")
+
+                        newArticles.forEach { article ->
+                            lifecycleScope.launch {
+                                val isSaved = articleViewModel.isArticleSaved(article.url).value
+                                if (isSaved != null && isSaved) {
+                                    articleViewModel.deleteAllCachedArticles()
+                                    Toast.makeText(
+                                        requireContext(),
+                                        "Article removed from saved list",
+                                        Toast.LENGTH_SHORT
+                                    ).show()
+                                } else {
+                                    articleViewModel.insert(article)
+                                }
+                            }
+                        }
+                        // Only submit the list of new articles to the adapter
+                        newsAdapter.submitList(newArticles)
                     } else {
                         Log.e("MainActivity", "News response is null")
                     }
@@ -89,34 +115,45 @@ class TopHeadlines : Fragment() , NewsAdapter.OnItemClickListener {
                     Log.e("MainActivity", "Error Body: ${response.errorBody()?.string()}")
                 }
             }
+
             override fun onFailure(call: Call<News>, t: Throwable) {
                 Log.e("MainActivity", "Failed to get news", t)
             }
         })
     }
+
     override fun onTitleClick(article: Article) {
         lifecycleScope.launch {
             val isSavedLiveData = articleViewModel.isArticleSaved(article.url)
-
-            // Observe the LiveData to get the value
             isSavedLiveData.observe(requireActivity()) { isSaved ->
                 if (isSaved != null) {
                     if (isSaved) {
                         articleViewModel.delete(article)
-                        Toast.makeText(requireContext(), "Article removed from saved list", Toast.LENGTH_SHORT).show()
+                        Toast.makeText(
+                            requireContext(),
+                            "Article removed from saved list",
+                            Toast.LENGTH_SHORT
+                        ).show()
                     } else {
-                        articleViewModel.insert(article)
-                        Toast.makeText(requireContext(), "Article saved", Toast.LENGTH_SHORT).show()
+                        articleViewModel.saveArticle(article)
+                        Toast.makeText(
+                            requireContext(),
+                            "Article saved",
+                            Toast.LENGTH_SHORT
+                        ).show()
                     }
                 } else {
-                    // Handle the case when isArticleSaved LiveData is null
-                    Toast.makeText(requireContext(), "Error determining article status", Toast.LENGTH_SHORT).show()
+                    Toast.makeText(
+                        requireContext(),
+                        "Error determining article status",
+                        Toast.LENGTH_SHORT
+                    ).show()
                 }
-                // Remove the observer to prevent multiple callbacks
                 isSavedLiveData.removeObservers(requireActivity())
             }
         }
     }
+
     override fun onImageOrDescriptionClick(article: Article) {
         val action = TopHeadlinesDirections.actionTopHeadlinesToFullNewsFragment(article)
         findNavController().navigate(action)
