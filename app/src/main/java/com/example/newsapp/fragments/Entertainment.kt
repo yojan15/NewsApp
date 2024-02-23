@@ -11,10 +11,8 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
-import com.example.newsapp.R
 import com.example.newsapp.adapter.NewsAdapter
 import com.example.newsapp.api.EntertainmentNewApi
-import com.example.newsapp.api.NewsApi
 import com.example.newsapp.data.Article
 import com.example.newsapp.data.News
 import com.example.newsapp.data.toArticle
@@ -40,7 +38,7 @@ class Entertainment : Fragment(), NewsAdapter.OnItemClickListener {
         // Inflate the layout for this fragment
         binding = FragmentEntertainmentBinding.inflate(inflater, container, false)
         setupRecyclerView()
-        articleViewModel = ViewModelProvider(this).get(ArticleViewModel::class.java)
+        articleViewModel = ViewModelProvider(this) [ArticleViewModel::class.java]
 
 
         articleViewModel.allCachedArticles.observe(viewLifecycleOwner) { cachedArticles ->

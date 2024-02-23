@@ -9,6 +9,7 @@ import androidx.navigation.findNavController
 import com.example.newsapp.databinding.ActivityMainBinding
 import com.example.newsapp.fragments.SavedNewsFragment
 import com.google.android.material.floatingactionbutton.FloatingActionButton
+import kotlinx.coroutines.flow.combine
 
 class MainActivity : AppCompatActivity() {
     private lateinit var binding : ActivityMainBinding
@@ -34,7 +35,6 @@ class MainActivity : AppCompatActivity() {
             showPopupMenu(fab)
         }
     }
-
     private fun showPopupMenu(view: View) {
         val popupMenu = PopupMenu(this, view)
         popupMenu.inflate(R.menu.menu_fab)
@@ -75,5 +75,14 @@ class MainActivity : AppCompatActivity() {
             }
         }
         popupMenu.show()
+    }
+
+    fun showFab() {
+        binding.floatingActionButton.show()
+        binding.ViewAllSavedNews.show()
+    }
+    fun hideFab() {
+        binding.floatingActionButton.hide()
+        binding.ViewAllSavedNews.hide()
     }
 }

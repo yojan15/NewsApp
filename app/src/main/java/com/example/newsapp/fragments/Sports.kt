@@ -39,7 +39,7 @@ private var savedArticles = mutableSetOf<String>()
         // Inflate the layout for this fragment
         binding = FragmentSportsBinding.inflate(inflater, container, false)
         setupRecyclerView()
-        articleViewModel = ViewModelProvider(this).get(ArticleViewModel::class.java)
+        articleViewModel = ViewModelProvider(this)[ArticleViewModel::class.java]
 
 
         articleViewModel.allCachedArticles.observe(viewLifecycleOwner) { cachedArticles ->

@@ -38,7 +38,7 @@ class Technology : Fragment() , NewsAdapter.OnItemClickListener {
         // Inflate the layout for this fragment
         binding = FragmentTechnologyBinding.inflate(inflater, container, false)
         setupRecyclerView()
-        articleViewModel = ViewModelProvider(this).get(ArticleViewModel::class.java)
+        articleViewModel = ViewModelProvider(this)[ArticleViewModel::class.java]
 
 
         articleViewModel.allCachedArticles.observe(viewLifecycleOwner) { cachedArticles ->

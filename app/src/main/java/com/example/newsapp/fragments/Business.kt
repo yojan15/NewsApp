@@ -7,14 +7,12 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
-import androidx.core.content.ContextCompat
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.newsapp.adapter.NewsAdapter
 import com.example.newsapp.api.BusinessNewsApi
-import com.example.newsapp.api.NewsApi
 import com.example.newsapp.data.Article
 import com.example.newsapp.data.News
 import com.example.newsapp.data.toArticle
@@ -39,7 +37,7 @@ class Business : Fragment() , NewsAdapter.OnItemClickListener {
     ): View {
         binding = FragmentBusinessBinding.inflate(inflater, container, false)
         setupRecyclerView()
-        articleViewModel = ViewModelProvider(this).get(ArticleViewModel::class.java)
+        articleViewModel = ViewModelProvider(this)[ArticleViewModel::class.java]
 
 
         articleViewModel.allCachedArticles.observe(viewLifecycleOwner) { cachedArticles ->
