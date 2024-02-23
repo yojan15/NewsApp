@@ -115,9 +115,13 @@ class SavedNewsFragment : Fragment(), NewsAdapter.OnItemClickListener {
         }
     }
     override fun onImageOrDescriptionClick(article: Article) {
-       val action = SavedNewsFragmentDirections.actionSavedNewsFragmentToFullNewsFragment(article)
-        findNavController().navigate(action)
+//        val action = SavedNewsFragmentDirections.actionSavedNewsFragmentToFullNewsFragment(article)
+//        findNavController().navigate(action)
+
+        Toast.makeText(requireContext(),"URL EXPIRED",Toast.LENGTH_SHORT).show()
     }
+
+
 
     override fun onTitleLongClick(article: Article, view: View): Boolean {
         val shareIntent = Intent(Intent.ACTION_SEND)
