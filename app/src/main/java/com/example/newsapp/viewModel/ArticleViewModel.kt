@@ -12,19 +12,30 @@ import com.example.newsapp.repository.ArticleRepository
 import kotlinx.coroutines.launch
 
 class ArticleViewModel(application: Application) : AndroidViewModel(application) {
-    // Private repository to encapsulate data access
+    /**
+     *  Private repository to encapsulate data access
+     */
     private val repository: ArticleRepository
 
-    // LiveData for observing the list of saved articles
+    /**
+     * LiveData for observing the list of saved articles
+     */
     private val _allArticle: LiveData<List<Article>>
 
-    // LiveData for observing the list of cached articles
+
+    /**
+     *  LiveData for observing the list of cached articles
+     */
     private val _allCachedArticles: LiveData<List<CachedArticle>>
 
-    // Public access to the LiveData for saved articles
+    /**
+     * public access live data for save article
+     */
     val allArticle: LiveData<List<Article>> get() = _allArticle
 
-    // Public access to the LiveData for cached articles
+    /**
+     * public access live data for cache article
+     */
     val allCachedArticles: LiveData<List<CachedArticle>> get() = _allCachedArticles
 
     init {
