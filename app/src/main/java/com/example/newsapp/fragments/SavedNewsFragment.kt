@@ -1,5 +1,6 @@
 package com.example.newsapp.fragments
 
+import android.content.Intent
 import android.os.Bundle
 import android.util.Log
 import androidx.fragment.app.Fragment
@@ -116,5 +117,13 @@ class SavedNewsFragment : Fragment(), NewsAdapter.OnItemClickListener {
     override fun onImageOrDescriptionClick(article: Article) {
        val action = SavedNewsFragmentDirections.actionSavedNewsFragmentToFullNewsFragment(article)
         findNavController().navigate(action)
+    }
+
+    override fun onTitleLongClick(article: Article, view: View): Boolean {
+        val shareIntent = Intent(Intent.ACTION_SEND)
+        shareIntent.type = "text/plain"
+        shareIntent.putExtra(Intent.EXTRA_TEXT, article.url)
+        startActivity(Intent.createChooser(shareIntent, "Share article URL"))
+        return true
     }
 }

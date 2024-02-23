@@ -25,6 +25,7 @@ class NewsAdapter(private val onItemListener: OnItemClickListener) :
     interface OnItemClickListener {
         fun onTitleClick(article: Article)
         fun onImageOrDescriptionClick(article: Article)
+        fun onTitleLongClick(article: Article , view: View) : Boolean
     }
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): NewsViewHolder {
         val view = LayoutInflater.from(parent.context)
@@ -50,6 +51,9 @@ class NewsAdapter(private val onItemListener: OnItemClickListener) :
         init {
             itemView.setOnClickListener(this)
             titleTextView.setOnClickListener(this)
+            titleTextView.setOnLongClickListener {
+                onItemListener.onTitleLongClick(getItem(adapterPosition), itemView)
+            }
         }
 
         fun bind(article: Article) {

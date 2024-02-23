@@ -1,5 +1,6 @@
 package com.example.newsapp.fragments
 
+import android.content.Intent
 import android.os.Bundle
 import android.util.Log
 import androidx.fragment.app.Fragment
@@ -108,8 +109,8 @@ class Business : Fragment() , NewsAdapter.OnItemClickListener {
                             article.url !in savedArticleUrls
                         }
 
-                        Log.d("MainActivity", "Response code: ${response.code()}")
-                        Log.d("MainActivity", "Number of articles: ${newArticles.size}")
+                        Log.d("com.example.newsapp.MainActivity", "Response code: ${response.code()}")
+                        Log.d("com.example.newsapp.MainActivity", "Number of articles: ${newArticles.size}")
 
                         newArticles.forEach { article ->
                             lifecycleScope.launch {
@@ -126,16 +127,16 @@ class Business : Fragment() , NewsAdapter.OnItemClickListener {
                         // Only submit the list of new articles to the adapter
                         newsAdapter.submitList(newArticles)
                     } else {
-                        Log.e("MainActivity", "News response is null")
+                        Log.e("com.example.newsapp.MainActivity", "News response is null")
                     }
                 } else {
-                    Log.e("MainActivity", "Error: ${response.message()}")
-                    Log.e("MainActivity", "Error Body: ${response.errorBody()?.string()}")
+                    Log.e("com.example.newsapp.MainActivity", "Error: ${response.message()}")
+                    Log.e("com.example.newsapp.MainActivity", "Error Body: ${response.errorBody()?.string()}")
                 }
             }
 
             override fun onFailure(call: Call<News>, t: Throwable) {
-                Log.e("MainActivity", "Failed to get news", t)
+                Log.e("com.example.newsapp.MainActivity", "Failed to get news", t)
             }
         })
     }
@@ -165,5 +166,13 @@ class Business : Fragment() , NewsAdapter.OnItemClickListener {
     override fun onImageOrDescriptionClick(article: Article) {
         val action = BusinessDirections.actionBusinessToFullNewsFragment(article)
         findNavController().navigate(action)
+    }
+
+    override fun onTitleLongClick(article: Article, view: View): Boolean {
+        val shareIntent = Intent(Intent.ACTION_SEND)
+        shareIntent.type = "text/plain"
+        shareIntent.putExtra(Intent.EXTRA_TEXT, article.url)
+        startActivity(Intent.createChooser(shareIntent, "Share article URL"))
+        return true
     }
 }
