@@ -1,6 +1,9 @@
 package com.example.newsapp.fragments
 
+import android.content.Context
+import android.content.DialogInterface
 import android.content.Intent
+import android.net.ConnectivityManager
 import android.os.Bundle
 import android.util.Log
 import androidx.fragment.app.Fragment
@@ -8,12 +11,13 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
+import androidx.appcompat.app.AlertDialog
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.newsapp.adapter.NewsAdapter
-import com.example.newsapp.api.NewsApi
+import com.example.newsapp.api.RetrofitClient
 import com.example.newsapp.data.Article
 import com.example.newsapp.data.News
 import com.example.newsapp.data.toArticle
@@ -23,8 +27,6 @@ import kotlinx.coroutines.launch
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
-import retrofit2.Retrofit
-import retrofit2.converter.gson.GsonConverterFactory
 class TopHeadlines : Fragment(), NewsAdapter.OnItemClickListener {
     private lateinit var binding: FragmentTopHeadlinesBinding
     private lateinit var newsAdapter: NewsAdapter
@@ -36,7 +38,6 @@ class TopHeadlines : Fragment(), NewsAdapter.OnItemClickListener {
         savedInstanceState: Bundle?
     ): View {
         binding = FragmentTopHeadlinesBinding.inflate(inflater, container, false)
-        setupRecyclerView()
         articleViewModel = ViewModelProvider(this)[ArticleViewModel::class.java]
 
 
@@ -57,6 +58,7 @@ class TopHeadlines : Fragment(), NewsAdapter.OnItemClickListener {
                 this.savedArticles.addAll(savedArticles.map { it.url })
             }
         }
+        setupRecyclerView()
         getNews()   // calling the function to getNews
         setupSwipeRefreshLayout()
         return binding.root
@@ -64,15 +66,41 @@ class TopHeadlines : Fragment(), NewsAdapter.OnItemClickListener {
 
     private fun setupSwipeRefreshLayout() {
         binding.topHeadlinesSwipeRefreshLayout.setOnRefreshListener {
-            /**
-             * swipe down to get the latest news
-             */
-            getNews()
-
-            articleViewModel.deleteAllCachedArticles()
-            Log.e("cached articles","${articleViewModel.allCachedArticles}")
-
+            if (isNetworkAvailable()) {
+                getNews()
+                articleViewModel.deleteAllCachedArticles()
+                Log.e("cached articles", "${articleViewModel.allCachedArticles}")
+            } else {
+                showOfflineDialog()
+                binding.topHeadlinesSwipeRefreshLayout.isRefreshing = false
+            }
         }
+    }
+    private fun showOfflineDialog() {
+        val builder = AlertDialog.Builder(requireContext())
+        builder.setTitle("No Internet Connection")
+            .setMessage("Please connect to the internet and try again.")
+            .setPositiveButton("Retry") { dialogInterface: DialogInterface, _: Int ->
+                dialogInterface.dismiss()
+                if (isNetworkAvailable()) {
+                    getNews()
+                    articleViewModel.deleteAllCachedArticles()
+                } else {
+                    showOfflineDialog()
+                }
+            }
+            .setNegativeButton("Exit") { dialogInterface: DialogInterface, _: Int ->
+                dialogInterface.dismiss()
+                requireActivity().finish()
+            }
+            .setCancelable(false)
+            .show()
+    }
+    private fun isNetworkAvailable(): Boolean {
+        val connectivityManager =
+            requireContext().getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
+        val activeNetworkInfo = connectivityManager.activeNetworkInfo
+        return activeNetworkInfo != null && activeNetworkInfo.isConnected
     }
     private fun setupRecyclerView() {
         /**
@@ -83,17 +111,10 @@ class TopHeadlines : Fragment(), NewsAdapter.OnItemClickListener {
         binding.recyclerView.layoutManager = LinearLayoutManager(requireContext())
     }
     private fun getNews() {
-        /**
-         * create an instance of a retrofit to call the articles from base url
-         */
-        val retrofitBuilder = Retrofit.Builder()
-            .addConverterFactory(GsonConverterFactory.create())
-            .baseUrl("https://newsapi.org/v2/")
-            .build()
-            .create(NewsApi::class.java)
+        val newsApi = RetrofitClient.newsApi
         binding.topHeadlinesSwipeRefreshLayout.isRefreshing = false
 
-        val retrofitData = retrofitBuilder.getNews()
+        val retrofitData = newsApi.getNews()
         retrofitData.enqueue(object : Callback<News> {
 
             override fun onResponse(call: Call<News>, response: Response<News>) {
@@ -113,18 +134,19 @@ class TopHeadlines : Fragment(), NewsAdapter.OnItemClickListener {
                             lifecycleScope.launch {
                                 val isSaved = articleViewModel.isArticleSaved(article.url).value
                                 if (isSaved != null && isSaved) {
-                                    // Delete all cached articles when a new article is saved
+                                    // Delete the entire cache when a new article is saved
                                     articleViewModel.deleteAllCachedArticles()
                                     Toast.makeText(
                                         requireContext(), "Article removed from saved list", Toast.LENGTH_SHORT
                                     ).show()
                                 } else {
+                                    // Insert new articles into the cache
                                     articleViewModel.insert(article)
                                 }
                             }
-                            // Only submit the list of new articles to the adapter
-                            newsAdapter.submitList(newArticles)
                         }
+                        // Only submit the list of new articles to the adapter
+                        newsAdapter.submitList(newArticles)
                     } else {
                         Log.e("com.example.newsapp.MainActivity", "News response is null")
                     }
@@ -139,6 +161,7 @@ class TopHeadlines : Fragment(), NewsAdapter.OnItemClickListener {
             }
         })
     }
+
     override fun onTitleClick(article: Article) {
         lifecycleScope.launch {
             val isSavedLiveData = articleViewModel.isArticleSaved(article.url)

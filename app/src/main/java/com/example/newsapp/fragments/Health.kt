@@ -1,6 +1,9 @@
 package com.example.newsapp.fragments
 
+import android.content.Context
+import android.content.DialogInterface
 import android.content.Intent
+import android.net.ConnectivityManager
 import android.os.Bundle
 import android.provider.SyncStateContract.Helpers
 import android.util.Log
@@ -9,6 +12,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
+import androidx.appcompat.app.AlertDialog
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
@@ -16,6 +20,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.newsapp.adapter.NewsAdapter
 import com.example.newsapp.api.HealthNewsApi
 import com.example.newsapp.api.NewsApi
+import com.example.newsapp.api.RetrofitClient
 import com.example.newsapp.data.Article
 import com.example.newsapp.data.News
 import com.example.newsapp.data.toArticle
@@ -67,14 +72,43 @@ class Health : Fragment(), NewsAdapter.OnItemClickListener {
 
     private fun setupSwipeRefreshLayout() {
         binding.healthSwipeRefreshLayout.setOnRefreshListener {
-            /**
-             * swipe down to get the latest news
-             */
-            getNews()
-
-            articleViewModel.deleteAllCachedArticles()
-            Log.e("cached articles","${articleViewModel.allCachedArticles}")
+            if (isNetworkAvailable()) {
+                getNews()
+                articleViewModel.deleteAllCachedArticles()
+                Log.e("cached articles", "${articleViewModel.allCachedArticles}")
+            } else {
+                showOfflineDialog()
+                binding.healthSwipeRefreshLayout.isRefreshing = false
+            }
         }
+    }
+
+    private fun showOfflineDialog() {
+        val builder = AlertDialog.Builder(requireContext())
+        builder.setTitle("No Internet Connection")
+            .setMessage("Please connect to the internet and try again.")
+            .setPositiveButton("Retry") { dialogInterface: DialogInterface, _: Int ->
+                dialogInterface.dismiss()
+                if (isNetworkAvailable()) {
+                    getNews()
+                    articleViewModel.deleteAllCachedArticles()
+                } else {
+                    showOfflineDialog()
+                }
+            }
+            .setNegativeButton("Exit") { dialogInterface: DialogInterface, _: Int ->
+                dialogInterface.dismiss()
+                requireActivity().finish()
+            }
+            .setCancelable(false)
+            .show()
+    }
+
+    private fun isNetworkAvailable(): Boolean {
+        val connectivityManager =
+            requireContext().getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
+        val activeNetworkInfo = connectivityManager.activeNetworkInfo
+        return activeNetworkInfo != null && activeNetworkInfo.isConnected
     }
 
     private fun setupRecyclerView() {
@@ -89,16 +123,10 @@ class Health : Fragment(), NewsAdapter.OnItemClickListener {
         /**
          * create an instance of a retrofit to call the articles from base url
          */
-        val retrofitBuilder = Retrofit.Builder()
-            .addConverterFactory(GsonConverterFactory.create())
-            .baseUrl("https://newsapi.org/v2/")
-            .build()
-            .create(HealthNewsApi::class.java)
+        val healthNewsApi = RetrofitClient.healthNewsApi
         binding.healthSwipeRefreshLayout.isRefreshing = false
-        articleViewModel.deleteAllCachedArticles()
-        Log.e("cached articles","${articleViewModel.allCachedArticles}")
 
-        val retrofitData = retrofitBuilder.getNews()
+        val retrofitData = healthNewsApi.getNews()
         retrofitData.enqueue(object : Callback<News> {
 
             override fun onResponse(call: Call<News>, response: Response<News>) {

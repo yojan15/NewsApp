@@ -1,6 +1,9 @@
 package com.example.newsapp.fragments
 
+import android.content.Context
+import android.content.DialogInterface
 import android.content.Intent
+import android.net.ConnectivityManager
 import android.os.Bundle
 import android.util.Log
 import androidx.fragment.app.Fragment
@@ -8,12 +11,14 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
+import androidx.appcompat.app.AlertDialog
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.newsapp.adapter.NewsAdapter
 import com.example.newsapp.api.EntertainmentNewApi
+import com.example.newsapp.api.RetrofitClient
 import com.example.newsapp.data.Article
 import com.example.newsapp.data.News
 import com.example.newsapp.data.toArticle
@@ -63,19 +68,46 @@ class Entertainment : Fragment(), NewsAdapter.OnItemClickListener {
         setupSwipeRefreshLayout()
         return binding.root
     }
-
     private fun setupSwipeRefreshLayout() {
         binding.entertainmentSwiperRefreshLayout.setOnRefreshListener {
-            /**
-             * swipe down to get the latest news
-             */
-            getNews()
-
-            articleViewModel.deleteAllCachedArticles()
-            Log.e("cached articles","${articleViewModel.allCachedArticles}")
+            if (isNetworkAvailable()) {
+                getNews()
+                articleViewModel.deleteAllCachedArticles()
+                Log.e("cached articles", "${articleViewModel.allCachedArticles}")
+            } else {
+                showOfflineDialog()
+                binding.entertainmentSwiperRefreshLayout.isRefreshing = false
+            }
         }
     }
 
+    private fun showOfflineDialog() {
+        val builder = AlertDialog.Builder(requireContext())
+        builder.setTitle("No Internet Connection")
+            .setMessage("Please connect to the internet and try again.")
+            .setPositiveButton("Retry") { dialogInterface: DialogInterface, _: Int ->
+                dialogInterface.dismiss()
+                if (isNetworkAvailable()) {
+                    getNews()
+                    articleViewModel.deleteAllCachedArticles()
+                } else {
+                    showOfflineDialog()
+                }
+            }
+            .setNegativeButton("Exit") { dialogInterface: DialogInterface, _: Int ->
+                dialogInterface.dismiss()
+                requireActivity().finish()
+            }
+            .setCancelable(false)
+            .show()
+    }
+
+    private fun isNetworkAvailable(): Boolean {
+        val connectivityManager =
+            requireContext().getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
+        val activeNetworkInfo = connectivityManager.activeNetworkInfo
+        return activeNetworkInfo != null && activeNetworkInfo.isConnected
+    }
     private fun setupRecyclerView() {
         /**
          * set up RecyclerView to get all the article in recyclerView
@@ -88,16 +120,9 @@ class Entertainment : Fragment(), NewsAdapter.OnItemClickListener {
         /**
          * create an instance of a retrofit to call the articles from base url
          */
-        val retrofitBuilder = Retrofit.Builder()
-            .addConverterFactory(GsonConverterFactory.create())
-            .baseUrl("https://newsapi.org/v2/")
-            .build()
-            .create(EntertainmentNewApi::class.java)
+        val entertainmentNewApi = RetrofitClient.entertainmentNewApi
         binding.entertainmentSwiperRefreshLayout.isRefreshing = false
-        articleViewModel.deleteAllCachedArticles()
-        Log.e("cached articles","${articleViewModel.allCachedArticles}")
-
-        val retrofitData = retrofitBuilder.getNews()
+        val retrofitData = entertainmentNewApi.getNews()
         retrofitData.enqueue(object : Callback<News> {
 
             override fun onResponse(call: Call<News>, response: Response<News>) {
