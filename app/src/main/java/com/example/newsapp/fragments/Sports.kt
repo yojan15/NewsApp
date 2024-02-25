@@ -15,6 +15,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.newsapp.R
 import com.example.newsapp.adapter.NewsAdapter
 import com.example.newsapp.api.NewsApi
+import com.example.newsapp.api.RetrofitClient
 import com.example.newsapp.api.SportsNewsApi
 import com.example.newsapp.data.Article
 import com.example.newsapp.data.News
@@ -89,16 +90,10 @@ private var savedArticles = mutableSetOf<String>()
         /**
          * create an instance of a retrofit to call the articles from base url
          */
-        val retrofitBuilder = Retrofit.Builder()
-            .addConverterFactory(GsonConverterFactory.create())
-            .baseUrl("https://newsapi.org/v2/")
-            .build()
-            .create(SportsNewsApi::class.java)
+        val sportsNewsApi = RetrofitClient.sportsNewsApi
         binding.sportsSwipeRefreshLayout.isRefreshing = false
-        articleViewModel.deleteAllCachedArticles()
-        Log.e("cached articles","${articleViewModel.allCachedArticles}")
 
-        val retrofitData = retrofitBuilder.getNews()
+        val retrofitData = sportsNewsApi.getNews()
         retrofitData.enqueue(object : Callback<News> {
 
             override fun onResponse(call: Call<News>, response: Response<News>) {

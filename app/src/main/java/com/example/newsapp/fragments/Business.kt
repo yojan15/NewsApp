@@ -13,7 +13,7 @@ import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.newsapp.adapter.NewsAdapter
-import com.example.newsapp.api.BusinessNewsApi
+import com.example.newsapp.api.RetrofitClient
 import com.example.newsapp.data.Article
 import com.example.newsapp.data.News
 import com.example.newsapp.data.toArticle
@@ -23,10 +23,7 @@ import kotlinx.coroutines.launch
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
-import retrofit2.Retrofit
-import retrofit2.converter.gson.GsonConverterFactory
 
-    
 class Business : Fragment() , NewsAdapter.OnItemClickListener {
     private lateinit var binding : FragmentBusinessBinding
     private lateinit var newsAdapter : NewsAdapter
@@ -87,16 +84,10 @@ class Business : Fragment() , NewsAdapter.OnItemClickListener {
         /**
          * create an instance of a retrofit to call the articles from base url
          */
-        val retrofitBuilder = Retrofit.Builder()
-            .addConverterFactory(GsonConverterFactory.create())
-            .baseUrl("https://newsapi.org/v2/")
-            .build()
-            .create(BusinessNewsApi::class.java)
+        val businessNewsApi = RetrofitClient.businessNewsApi
         binding.swipeRefreshLayout.isRefreshing = false
-        articleViewModel.deleteAllCachedArticles()
-        Log.e("cached articles","${articleViewModel.allCachedArticles}")
 
-        val retrofitData = retrofitBuilder.getNews()
+        val retrofitData = businessNewsApi.getNews()
         retrofitData.enqueue(object : Callback<News> {
 
             override fun onResponse(call: Call<News>, response: Response<News>) {

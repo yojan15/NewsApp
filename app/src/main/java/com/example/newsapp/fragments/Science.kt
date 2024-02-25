@@ -15,6 +15,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.newsapp.R
 import com.example.newsapp.adapter.NewsAdapter
 import com.example.newsapp.api.NewsApi
+import com.example.newsapp.api.RetrofitClient
 import com.example.newsapp.api.ScienceNewsApi
 import com.example.newsapp.data.Article
 import com.example.newsapp.data.News
@@ -89,16 +90,10 @@ class Science : Fragment(), NewsAdapter.OnItemClickListener {
         /**
          * create an instance of a retrofit to call the articles from base url
          */
-        val retrofitBuilder = Retrofit.Builder()
-            .addConverterFactory(GsonConverterFactory.create())
-            .baseUrl("https://newsapi.org/v2/")
-            .build()
-            .create(ScienceNewsApi::class.java)
+        val scienceNewsApi = RetrofitClient.scienceNewsApi
         binding.scienceSwipeRefreshLayout.isRefreshing = false
-        articleViewModel.deleteAllCachedArticles()
-        Log.e("cached articles","${articleViewModel.allCachedArticles}")
 
-        val retrofitData = retrofitBuilder.getNews()
+        val retrofitData = scienceNewsApi.getNews()
         retrofitData.enqueue(object : Callback<News> {
 
             override fun onResponse(call: Call<News>, response: Response<News>) {
