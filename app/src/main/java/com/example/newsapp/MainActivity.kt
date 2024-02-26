@@ -4,6 +4,7 @@ import android.os.Bundle
 import android.util.Log
 import android.view.Menu
 import android.view.View
+import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.PopupMenu
 import androidx.appcompat.widget.SearchView
@@ -32,12 +33,9 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
-
         supportActionBar?.title = "News"
 
-        // Initialize NavController
-        val navHostFragment =
-            supportFragmentManager.findFragmentById(R.id.fragmentContainerView) as NavHostFragment
+        val navHostFragment = supportFragmentManager.findFragmentById(R.id.fragmentContainerView) as NavHostFragment
         navController = navHostFragment.navController
 
         binding.ViewAllSavedNews.setOnClickListener {
@@ -48,7 +46,6 @@ class MainActivity : AppCompatActivity() {
                 .setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN)
                 .commit()
         }
-
         val fab: FloatingActionButton = binding.floatingActionButton
         fab.setOnClickListener {
             showPopupMenu(fab)
@@ -67,7 +64,6 @@ class MainActivity : AppCompatActivity() {
             }
         }
     }
-
     private fun showPopupMenu(view: View) {
         val popupMenu = PopupMenu(this, view)
         popupMenu.inflate(R.menu.menu_fab)
@@ -114,17 +110,14 @@ class MainActivity : AppCompatActivity() {
         }
         popupMenu.show()
     }
-
     fun showFab() {
         binding.floatingActionButton.show()
         binding.ViewAllSavedNews.show()
     }
-
     fun hideFab() {
         binding.floatingActionButton.hide()
         binding.ViewAllSavedNews.hide()
     }
-
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
         menuInflater.inflate(R.menu.my_menu, menu)
 
@@ -138,7 +131,6 @@ class MainActivity : AppCompatActivity() {
                 }
                 return true
             }
-
             override fun onQueryTextChange(newText: String?): Boolean {
                 if (!newText.isNullOrBlank()) {
                     searchApi(newText)
@@ -148,7 +140,6 @@ class MainActivity : AppCompatActivity() {
         })
         return true
     }
-
     private fun searchApi(query: String) {
         val retrofit = Retrofit.Builder()
             .baseUrl("https://newsapi.org/v2/")
@@ -170,12 +161,9 @@ class MainActivity : AppCompatActivity() {
                     val recyclerView: RecyclerView = findViewById(R.id.recyclerView)
                     val adapter = NewsAdapter(object : NewsAdapter.OnItemClickListener {
 
-                        override fun onTitleClick(article: Article) {
+                        override fun onTitleClick(article: Article) {}
 
-                        }
-
-                        override fun onImageOrDescriptionClick(article: Article) {
-                        }
+                        override fun onImageOrDescriptionClick(article: Article) {}
 
                         override fun onTitleLongClick(article: Article, view: View): Boolean {
                             return true
@@ -185,9 +173,9 @@ class MainActivity : AppCompatActivity() {
                     adapter.submitList(articles)
                 } else {
                     Log.e("searching", "failed")
+                    Toast.makeText(this@MainActivity,"No Data Found..",Toast.LENGTH_SHORT).show()
                 }
             }
-
             override fun onFailure(call: Call<News>, t: Throwable) {
                Log.e("MainActivity","$t")
             }
