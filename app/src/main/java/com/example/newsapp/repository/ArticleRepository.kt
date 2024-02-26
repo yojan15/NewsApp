@@ -19,7 +19,6 @@ class ArticleRepository(private val articleDao: ArticleDao) {
      */
     val allCacheArticles: LiveData<List<CachedArticle>> = articleDao.getAllCachedArticles()
 
-
     suspend fun saveArticle(article: Article) {
         /**
          * save the Article in Article database manually when user clicks
