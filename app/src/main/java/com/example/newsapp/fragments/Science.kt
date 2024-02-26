@@ -16,11 +16,8 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
-import com.example.newsapp.R
 import com.example.newsapp.adapter.NewsAdapter
-import com.example.newsapp.api.NewsApi
 import com.example.newsapp.api.RetrofitClient
-import com.example.newsapp.api.ScienceNewsApi
 import com.example.newsapp.data.Article
 import com.example.newsapp.data.News
 import com.example.newsapp.data.toArticle
@@ -30,8 +27,6 @@ import kotlinx.coroutines.launch
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
-import retrofit2.Retrofit
-import retrofit2.converter.gson.GsonConverterFactory
 
 class Science : Fragment(), NewsAdapter.OnItemClickListener {
     private lateinit var binding : FragmentScienceBinding

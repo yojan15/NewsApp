@@ -10,6 +10,12 @@ interface NewsApi {
     fun getNews(
         @Query("source") source : String = "google-news",
         @Query("country") country: String = "in",
-        @Query("apiKey") apiKey: String = "f8b7a3eefc6549d2822d921d51325364"
+        @Query("apiKey") apiKey: String = "ed2aa9a39cc344459a5f147eb22f6433"
+    ): Call<News>
+
+    @GET("everything")
+    fun searchNews(
+        @Query("q") query: String,
+        @Query("apiKey") apiKey: String = "ed2aa9a39cc344459a5f147eb22f6433"
     ): Call<News>
 }

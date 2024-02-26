@@ -22,11 +22,13 @@ class NewsAdapter(private val onItemListener: OnItemClickListener) :
         savedArticle = articles
         notifyDataSetChanged()
     }
+
     interface OnItemClickListener {
         fun onTitleClick(article: Article)
         fun onImageOrDescriptionClick(article: Article)
-        fun onTitleLongClick(article: Article , view: View) : Boolean
+        fun onTitleLongClick(article: Article, view: View): Boolean
     }
+
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): NewsViewHolder {
         val view = LayoutInflater.from(parent.context)
             .inflate(R.layout.news, parent, false)
@@ -94,10 +96,12 @@ class NewsAdapter(private val onItemListener: OnItemClickListener) :
         }
     }
 }
+
 class ArticleDiffCallback : DiffUtil.ItemCallback<Article>() {
     override fun areItemsTheSame(oldItem: Article, newItem: Article): Boolean {
         return oldItem.url == newItem.url
     }
+
     override fun areContentsTheSame(oldItem: Article, newItem: Article): Boolean {
         return oldItem == newItem
     }
