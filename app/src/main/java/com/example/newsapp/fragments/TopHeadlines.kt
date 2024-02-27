@@ -10,12 +10,15 @@ import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
+import androidx.core.content.ContextCompat
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
+import com.example.newsapp.R
 import com.example.newsapp.adapter.NewsAdapter
 import com.example.newsapp.api.RetrofitClient
 import com.example.newsapp.data.Article
@@ -23,6 +26,7 @@ import com.example.newsapp.data.News
 import com.example.newsapp.data.toArticle
 import com.example.newsapp.databinding.FragmentTopHeadlinesBinding
 import com.example.newsapp.viewModel.ArticleViewModel
+import com.google.android.material.snackbar.Snackbar
 import kotlinx.coroutines.launch
 import retrofit2.Call
 import retrofit2.Callback
@@ -82,20 +86,40 @@ class TopHeadlines : Fragment(), NewsAdapter.OnItemClickListener {
             .setMessage("Please connect to the internet and try again.")
             .setPositiveButton("Retry") { dialogInterface: DialogInterface, _: Int ->
                 dialogInterface.dismiss()
+
                 if (isNetworkAvailable()) {
                     getNews()
                     articleViewModel.deleteAllCachedArticles()
                 } else {
-                    showOfflineDialog()
+                    view?.let {
+                        val customSnackbarView = LayoutInflater.from(it.context)
+                            .inflate(R.layout.custom_snackbar_layout, null)
+                        val snackbar = Snackbar.make(it, "", Snackbar.LENGTH_SHORT)
+                        val msg = "No Connection"
+                        val textView = customSnackbarView.findViewById<TextView>(android.R.id.text1)
+                        textView.text = msg
+
+                        // Set background color
+                        snackbar.view.setBackgroundColor(
+                            ContextCompat.getColor(
+                                it.context,
+                                R.color.custom_snackbar_color))
+                        (snackbar.view as Snackbar.SnackbarLayout).apply {
+                            removeAllViews() // Remove existing views
+                            addView(customSnackbarView)
+                        }
+                        snackbar.show()
+                    }
                 }
+                }
+                    .setNegativeButton("Exit") { dialogInterface: DialogInterface, _: Int ->
+                        dialogInterface.dismiss()
+                        requireActivity().finish()
+                    }
+                    .setCancelable(false)
+                    .show()
             }
-            .setNegativeButton("Exit") { dialogInterface: DialogInterface, _: Int ->
-                dialogInterface.dismiss()
-                requireActivity().finish()
-            }
-            .setCancelable(false)
-            .show()
-    }
+
     private fun isNetworkAvailable(): Boolean {
         val connectivityManager =
             requireContext().getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
@@ -136,9 +160,7 @@ class TopHeadlines : Fragment(), NewsAdapter.OnItemClickListener {
                                 if (isSaved != null && isSaved) {
                                     // Delete the entire cache when a new article is saved
                                     articleViewModel.deleteAllCachedArticles()
-                                    Toast.makeText(
-                                        requireContext(), "Article removed from saved list", Toast.LENGTH_SHORT
-                                    ).show()
+//                                    Toast.makeText(requireContext(), "Article removed from saved list", Toast.LENGTH_SHORT).show()
                                 } else {
                                     // Insert new articles into the cache
                                     articleViewModel.insert(article)
@@ -169,12 +191,13 @@ class TopHeadlines : Fragment(), NewsAdapter.OnItemClickListener {
                 if (isSaved != null) {
                     if (isSaved) {
                         articleViewModel.delete(article)
-                        Toast.makeText(
-                            requireContext(),
-                            "Article removed from saved list", Toast.LENGTH_SHORT).show()
+//                        Toast.makeText(requireContext(),"Article removed from saved list", Toast.LENGTH_SHORT).show()
+                        view?.let { Snackbar.make(it,"Article Removed ",Snackbar.LENGTH_SHORT).show() }
                     } else {
                         articleViewModel.saveArticle(article)
-                        Toast.makeText(requireContext(), "Article saved", Toast.LENGTH_SHORT).show()
+//                        Toast.makeText(requireContext(), "Article saved", Toast.LENGTH_SHORT).show()
+                  view?.let { Snackbar.make(it,"Article Saved",Snackbar.LENGTH_SHORT).show() }
+
                     }
                 } else {
                     Toast.makeText(

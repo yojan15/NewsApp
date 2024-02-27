@@ -36,7 +36,7 @@ class Business : Fragment() , NewsAdapter.OnItemClickListener {
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View {
+    ): View {;
         binding = FragmentBusinessBinding.inflate(inflater, container, false)
         setupRecyclerView()
         articleViewModel = ViewModelProvider(this)[ArticleViewModel::class.java]
