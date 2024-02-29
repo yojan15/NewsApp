@@ -26,15 +26,6 @@ class ArticleRepository(private val articleDao: ArticleDao) {
          */
         articleDao.insert(article)
     }
-    suspend fun insert(article: Article) {
-        /**
-         * this function is to save cached articles
-         * for example when user is accessing application over the internet
-         * it will save that news in cache
-         */
-        val cachedArticle = article.toCachedArticle()
-        articleDao.insertCachedArticle(cachedArticle)
-    }
     suspend fun deleteAllCachedArticles() {
         /**
          * delete cached article
@@ -51,7 +42,18 @@ class ArticleRepository(private val articleDao: ArticleDao) {
         return articleDao.isArticleSaved(url)
     }
 
-    private fun Article.toCachedArticle(): CachedArticle {
+    suspend fun insertByCategory(article: Article, category: String): CachedArticle {
+        val cachedArticle = article.toCachedArticle(category)
+        articleDao.insertCachedArticle(cachedArticle)
+        return cachedArticle
+    }
+
+    fun getArticlesByCategory(category: String): LiveData<List<CachedArticle>> {
+        return articleDao.getArticlesByCategory(category)
+    }
+
+
+    private fun Article.toCachedArticle(category: String): CachedArticle {
         return CachedArticle(
             url = this.url,
             publishedAt = this.publishedAt,
@@ -59,7 +61,8 @@ class ArticleRepository(private val articleDao: ArticleDao) {
             description = this.description,
             title = this.title,
             author = this.author,
-            content = this.content
+            content = this.content,
+            category = category
         )
     }
     suspend fun delete(article: Article) {

@@ -12,7 +12,8 @@ data class CachedArticle(
     val description: String? = null,
     val title: String,
     val author: String? = null,
-    val content: String? = null
+    val content: String? = null,
+    val category: String
 )
 
 fun CachedArticle.toArticle(): Article {
@@ -23,6 +24,7 @@ fun CachedArticle.toArticle(): Article {
         description = this.description,
         title = this.title,
         author = this.author,
-        content = this.content
+        content = this.content,
+        category = category
     )
 }

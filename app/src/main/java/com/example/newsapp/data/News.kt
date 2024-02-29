@@ -21,7 +21,8 @@ data class Article(
     @PrimaryKey
     val url: String,
     val author: String? = null,
-    val content: String? = null
+    val content: String? = null,
+    val category: String
 ) : Parcelable
 
 data class Source(

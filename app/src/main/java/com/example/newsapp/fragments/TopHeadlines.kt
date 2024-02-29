@@ -37,6 +37,8 @@ class TopHeadlines : Fragment(), NewsAdapter.OnItemClickListener {
     private lateinit var articleViewModel: ArticleViewModel
     private val savedArticles = mutableSetOf<String>()
 
+    private var currentCategory: String = "TopNews"
+
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
@@ -44,30 +46,43 @@ class TopHeadlines : Fragment(), NewsAdapter.OnItemClickListener {
         binding = FragmentTopHeadlinesBinding.inflate(inflater, container, false)
         articleViewModel = ViewModelProvider(this)[ArticleViewModel::class.java]
 
-
-        articleViewModel.allCachedArticles.observe(viewLifecycleOwner) { cachedArticles ->
-            /**
-             * gets all the articles from cacheArticle table when user is not connected to internet
-             */
+        articleViewModel.getArticlesByCategory(currentCategory).observe(viewLifecycleOwner) { cachedArticles ->
             val articles = cachedArticles.map { it.toArticle() }
             newsAdapter.submitList(articles)
+        }
+
+
+        // Observe cached articles from the cacheArticle table
+//        articleViewModel.allCachedArticles.observe(viewLifecycleOwner) { cachedArticles ->
+//            // Clear the existing list of articles to show only category-wise articles
+//            newsAdapter.submitList(emptyList())
+//
+//            // Get all the articles from cacheArticle table when the user is not connected to the internet
+//            val articles = cachedArticles.map { it.toArticle() }
+//            newsAdapter.submitList(articles)
 
             // Now, observe saved articles and update the list
             articleViewModel.allArticle.observe(viewLifecycleOwner) { savedArticles ->
                 Log.d("TopHeadlines", "Saved articles: $savedArticles")
-                /**
-                 * gets all the articles from Article table when user is connected to internet
-                 */
+                // Get all the articles from the Article table when the user is connected to the internet
                 this.savedArticles.clear()
                 this.savedArticles.addAll(savedArticles.map { it.url })
             }
-        }
+
         setupRecyclerView()
         getNews()   // calling the function to getNews
         setupSwipeRefreshLayout()
         return binding.root
     }
+    fun updateCurrentCategory(category: String) {
+        currentCategory = category
 
+        // Update the observation of cached articles based on the new category
+        articleViewModel.getArticlesByCategory(currentCategory).observe(viewLifecycleOwner) { cachedArticles ->
+            val articles = cachedArticles.map { it.toArticle() }
+            newsAdapter.submitList(articles)
+        }
+    }
     private fun setupSwipeRefreshLayout() {
         binding.topHeadlinesSwipeRefreshLayout.setOnRefreshListener {
             if (isNetworkAvailable()) {
@@ -160,10 +175,10 @@ class TopHeadlines : Fragment(), NewsAdapter.OnItemClickListener {
                                 if (isSaved != null && isSaved) {
                                     // Delete the entire cache when a new article is saved
                                     articleViewModel.deleteAllCachedArticles()
-//                                    Toast.makeText(requireContext(), "Article removed from saved list", Toast.LENGTH_SHORT).show()
+//                                Toast.makeText(requireContext(), "Article removed from saved list", Toast.LENGTH_SHORT).show()
                                 } else {
-                                    // Insert new articles into the cache
-                                    articleViewModel.insert(article)
+                                    // Insert new articles into the cache with the "TopNews" category
+                                    articleViewModel.insertByCategory(article, "TopNews")
                                 }
                             }
                         }
@@ -183,6 +198,7 @@ class TopHeadlines : Fragment(), NewsAdapter.OnItemClickListener {
             }
         })
     }
+
 
     override fun onTitleClick(article: Article) {
         lifecycleScope.launch {

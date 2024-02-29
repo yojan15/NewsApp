@@ -103,7 +103,7 @@ class SavedNewsFragment : Fragment(), NewsAdapter.OnItemClickListener {
                         articleViewModel.delete(article)
                         Toast.makeText(requireContext(), "Article removed from saved list", Toast.LENGTH_SHORT).show()
                     } else {
-                        articleViewModel.insert(article)
+                        articleViewModel.insertByCategory(article,"default")
                         Toast.makeText(requireContext(), "Article saved", Toast.LENGTH_SHORT).show()
                     }
                 } else {
@@ -118,8 +118,6 @@ class SavedNewsFragment : Fragment(), NewsAdapter.OnItemClickListener {
     override fun onImageOrDescriptionClick(article: Article) {
 //        val action = SavedNewsFragmentDirections.actionSavedNewsFragmentToFullNewsFragment(article)
 //        findNavController().navigate(action)
-
-
     }
 
     override fun onTitleLongClick(article: Article, view: View): Boolean {

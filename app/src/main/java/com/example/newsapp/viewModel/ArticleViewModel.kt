@@ -49,9 +49,7 @@ class ArticleViewModel(application: Application) : AndroidViewModel(application)
      * Insert an article into the database.
      * @param article The article to be inserted.
      */
-    fun insert(article: Article) = viewModelScope.launch {
-        repository.insert(article)
-    }
+
 
     fun delete(article: Article) = viewModelScope.launch {
         repository.delete(article)
@@ -75,5 +73,13 @@ class ArticleViewModel(application: Application) : AndroidViewModel(application)
 
     fun saveArticle(article: Article) = viewModelScope.launch {
         repository.saveArticle(article)
+    }
+
+    fun insertByCategory(article: Article, category: String) = viewModelScope.launch {
+        repository.insertByCategory(article, category)
+    }
+
+    fun getArticlesByCategory(category: String): LiveData<List<CachedArticle>> {
+        return repository.getArticlesByCategory(category)
     }
 }
