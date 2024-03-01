@@ -1,5 +1,6 @@
 package com.example.newsapp.adapter
 
+import android.content.Intent
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -17,7 +18,6 @@ class NewsAdapter(private val onItemListener: OnItemClickListener) :
     ListAdapter<Article, NewsAdapter.NewsViewHolder>(ArticleDiffCallback()) {
 
     private var savedArticle: List<Article> = emptyList()
-
     fun setSavedArticles(articles: List<Article>) {
         savedArticle = articles
         notifyDataSetChanged()
@@ -48,11 +48,14 @@ class NewsAdapter(private val onItemListener: OnItemClickListener) :
             itemView.findViewById(R.id.descriptionTextView)
         private val authorTextView: TextView = itemView.findViewById(R.id.authorTextView)
 
+        private val shareArticle : ImageView = itemView.findViewById(R.id.share)
+
         private var isTitleClicked = false
 
         init {
             itemView.setOnClickListener(this)
             titleTextView.setOnClickListener(this)
+            shareArticle.setOnClickListener(this)
             titleTextView.setOnLongClickListener {
                 onItemListener.onTitleLongClick(getItem(adapterPosition), itemView)
             }
@@ -90,6 +93,16 @@ class NewsAdapter(private val onItemListener: OnItemClickListener) :
                         )
                         onItemListener.onTitleClick(getItem(position))
                     }
+                    R.id.share -> {
+                        val article = getItem(position)
+                        val shareIntent = Intent(Intent.ACTION_SEND)
+                        shareIntent.type = "text/plain"
+                        shareIntent.putExtra(Intent.EXTRA_SUBJECT, article.title)
+                        shareIntent.putExtra(Intent.EXTRA_TEXT, article.url)
+                        itemView.context.startActivity(Intent.createChooser(shareIntent, "Share link via"))
+                    }
+
+
                     else -> onItemListener.onImageOrDescriptionClick(getItem(position))
                 }
             }
