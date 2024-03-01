@@ -38,6 +38,7 @@ private lateinit var binding : FragmentSportsBinding
 private lateinit var newsAdapter: NewsAdapter
 private lateinit var articleViewModel: ArticleViewModel
 private var savedArticles = mutableSetOf<String>()
+private val currentCategory = "Sports"
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
@@ -48,22 +49,26 @@ private var savedArticles = mutableSetOf<String>()
         articleViewModel = ViewModelProvider(this)[ArticleViewModel::class.java]
 
 
-        articleViewModel.allCachedArticles.observe(viewLifecycleOwner) { cachedArticles ->
-            /**
-             * gets all the articles from cacheArticle table when user is not connected to internet
-             */
+        articleViewModel.getArticlesByCategory(currentCategory).observe(viewLifecycleOwner) { cachedArticles ->
             val articles = cachedArticles.map { it.toArticle() }
             newsAdapter.submitList(articles)
+        }
 
-            // Now, observe saved articles and update the list
-            articleViewModel.allArticle.observe(viewLifecycleOwner) { savedArticles ->
-                Log.d("TopHeadlines", "Saved articles: $savedArticles")
-                /**
-                 * gets all the articles from Article table when user is connected to internet
-                 */
-                this.savedArticles.clear()
-                this.savedArticles.addAll(savedArticles.map { it.url })
-            }
+        // Observe cached articles from the cacheArticle table
+//        articleViewModel.allCachedArticles.observe(viewLifecycleOwner) { cachedArticles ->
+//            // Clear the existing list of articles to show only category-wise articles
+//            newsAdapter.submitList(emptyList())
+//
+//            // Get all the articles from cacheArticle table when the user is not connected to the internet
+//            val articles = cachedArticles.map { it.toArticle() }
+//            newsAdapter.submitList(articles)
+
+        // Now, observe saved articles and update the list
+        articleViewModel.allArticle.observe(viewLifecycleOwner) { savedArticles ->
+            Log.d("TopHeadlines", "Saved articles: $savedArticles")
+            // Get all the articles from the Article table when the user is connected to the internet
+            this.savedArticles.clear()
+            this.savedArticles.addAll(savedArticles.map { it.url })
         }
         getNews()   // calling the function to getNews
         setupSwipeRefreshLayout()
