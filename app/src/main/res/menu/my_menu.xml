@@ -9,7 +9,7 @@
 
     <item
         android:id="@+id/action_toggle_day_night"
-        android:icon="@drawable/baseline_mode_night_24"
+        app:actionViewClass="android.widget.ImageView"
         android:title="Toggle Day/Night"
         app:showAsAction="ifRoom" />
 

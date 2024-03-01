@@ -6,6 +6,7 @@ import android.util.Log
 import android.view.Menu
 import android.view.MenuItem
 import android.view.View
+import android.widget.ImageView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.app.AppCompatDelegate
@@ -21,6 +22,7 @@ import com.example.newsapp.data.Article
 import com.example.newsapp.data.News
 import com.example.newsapp.databinding.ActivityMainBinding
 import com.example.newsapp.fragments.About
+import com.example.newsapp.themeUtils.ThemeUtils
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import retrofit2.Call
 import retrofit2.Callback
@@ -31,7 +33,6 @@ import retrofit2.converter.gson.GsonConverterFactory
 class MainActivity : AppCompatActivity() {
     private lateinit var binding: ActivityMainBinding
     private lateinit var navController: NavController
-    private var darkTheme = false
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -55,6 +56,8 @@ class MainActivity : AppCompatActivity() {
         val fab: FloatingActionButton = binding.floatingActionButton
         fab.setOnClickListener {
             showPopupMenu(fab)
+
+
         }
         navController.addOnDestinationChangedListener { _, destination, _ ->
             supportActionBar?.title = when (destination.id) {
@@ -112,7 +115,6 @@ class MainActivity : AppCompatActivity() {
                     navController.navigate(R.id.technology)
                     true
                 }
-
                 else -> false
             }
         }
@@ -138,6 +140,9 @@ class MainActivity : AppCompatActivity() {
                 if (!query.isNullOrBlank()) {
                     searchApi(query)
                 }
+
+                val dayNightItem = menu.findItem(R.id.action_toggle_day_night)
+                updateDayNightIcon(dayNightItem)
                 return true
             }
 
@@ -151,6 +156,12 @@ class MainActivity : AppCompatActivity() {
         return true
     }
 
+    override fun onPrepareOptionsMenu(menu: Menu?): Boolean {
+        val dayNightItem = menu!!.findItem(R.id.action_toggle_day_night)
+        updateDayNightIcon(dayNightItem)
+
+        return super.onPrepareOptionsMenu(menu)
+    }
     private fun searchApi(query: String) {
         val retrofit = Retrofit.Builder()
             .baseUrl("https://newsapi.org/v2/")
@@ -187,7 +198,6 @@ class MainActivity : AppCompatActivity() {
                     Toast.makeText(this@MainActivity, "No Data Found..", Toast.LENGTH_SHORT).show()
                 }
             }
-
             override fun onFailure(call: Call<News>, t: Throwable) {
                 Log.e("MainActivity", "$t")
             }
@@ -196,7 +206,7 @@ class MainActivity : AppCompatActivity() {
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         when (item.itemId) {
-            R.id.save -> {
+            R.id.save ->  {
                 navController.navigate(R.id.savedNewsFragment)
                 // Toast.makeText(this,"saved Clicked",Toast.LENGTH_SHORT).show()
             }
@@ -214,6 +224,7 @@ class MainActivity : AppCompatActivity() {
 
             R.id.action_toggle_day_night -> {
                 toggleDayNightTheme()
+                updateDayNightIcon(item)
                 return true
             }
 
@@ -221,6 +232,7 @@ class MainActivity : AppCompatActivity() {
         }
         return super.onOptionsItemSelected(item)
     }
+
     private fun toggleDayNightTheme() {
         val currentNightMode = resources.configuration.uiMode and Configuration.UI_MODE_NIGHT_MASK
         val newNightMode = when (currentNightMode) {
@@ -229,6 +241,22 @@ class MainActivity : AppCompatActivity() {
             else -> AppCompatDelegate.MODE_NIGHT_FOLLOW_SYSTEM
         }
         AppCompatDelegate.setDefaultNightMode(newNightMode)
-        recreate() 
+        recreate()
+    }
+
+    private fun updateDayNightIcon(item: MenuItem) {
+        val iconResId = if (ThemeUtils.isDarkTheme(this)) {
+            R.drawable.baseline_mode_night_24
+        } else {
+            R.drawable.baseline_sunny_24
+        }
+        val actionView = item.actionView as? ImageView
+        actionView?.apply {
+            setImageResource(iconResId)
+            setOnClickListener {
+                toggleDayNightTheme()
+                updateDayNightIcon(item)
+            }
+        }
     }
 }
