@@ -212,7 +212,6 @@ class MainActivity : AppCompatActivity() {
             }
 
             R.id.about -> {
-
                 val fragment = About()
                 supportFragmentManager.beginTransaction()
                     .replace(R.id.fragmentContainerView, fragment)
@@ -227,8 +226,9 @@ class MainActivity : AppCompatActivity() {
                 updateDayNightIcon(item)
                 return true
             }
-
-            else -> return super.onOptionsItemSelected(item)
+            else -> {
+                binding.floatingActionButton.show()
+            }
         }
         return super.onOptionsItemSelected(item)
     }

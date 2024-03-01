@@ -135,10 +135,7 @@
                 app:argType="com.example.newsapp.data.Article" />
         </action>
         <action
-            android:id="@+id/action_sports_to_about2"
-            app:destination="@id/about" />
-        <action
-            android:id="@+id/action_sports_to_about22"
+            android:id="@+id/action_sports_to_about"
             app:destination="@id/about" />
     </fragment>
 
@@ -155,7 +152,7 @@
                 app:argType="com.example.newsapp.data.Article"/>
         </action>
         <action
-            android:id="@+id/action_savedNewsFragment_to_about2"
+            android:id="@+id/action_savedNewsFragment_to_about"
             app:destination="@id/about" />
     </fragment>
     <fragment
