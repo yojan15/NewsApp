@@ -17,19 +17,19 @@ import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.newsapp.adapter.NewsAdapter
-import com.example.newsapp.api.EntertainmentNewApi
 import com.example.newsapp.api.RetrofitClient
 import com.example.newsapp.data.Article
 import com.example.newsapp.data.News
 import com.example.newsapp.data.toArticle
 import com.example.newsapp.databinding.FragmentEntertainmentBinding
 import com.example.newsapp.viewModel.ArticleViewModel
+import com.google.android.material.snackbar.Snackbar
 import kotlinx.coroutines.launch
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
-import retrofit2.Retrofit
-import retrofit2.converter.gson.GsonConverterFactory
+
+
 
 class Entertainment : Fragment(), NewsAdapter.OnItemClickListener {
     private lateinit var binding : FragmentEntertainmentBinding
@@ -178,12 +178,13 @@ class Entertainment : Fragment(), NewsAdapter.OnItemClickListener {
                 if (isSaved != null) {
                     if (isSaved) {
                         articleViewModel.delete(article)
-                        Toast.makeText(
-                            requireContext(),
-                            "Article removed from saved list", Toast.LENGTH_SHORT).show()
+                       // Toast.makeText(requireContext(),"Article removed from saved list", Toast.LENGTH_SHORT).show()
+
+                        view?.let { Snackbar.make(it,"Article Delete ", Snackbar.LENGTH_SHORT).show() }
                     } else {
                         articleViewModel.saveArticle(article)
-                        Toast.makeText(requireContext(), "Article saved", Toast.LENGTH_SHORT).show()
+//                        Toast.makeText(requireContext(), "Article saved", Toast.LENGTH_SHORT).show()
+                        view?.let { Snackbar.make(it,"Article Saved ", Snackbar.LENGTH_SHORT).show() }
                     }
                 } else {
                     Toast.makeText(

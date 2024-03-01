@@ -16,6 +16,9 @@
                 android:name="selectedArticle"
                 app:argType="com.example.newsapp.data.Article" />
         </action>
+        <action
+            android:id="@+id/action_topHeadlines_to_about2"
+            app:destination="@id/about2" />
     </fragment>
 
     <fragment
@@ -43,6 +46,9 @@
                 android:name="selectedArticle"
                 app:argType="com.example.newsapp.data.Article" />
         </action>
+        <action
+            android:id="@+id/action_business_to_about2"
+            app:destination="@id/about2" />
     </fragment>
 
     <fragment
@@ -57,6 +63,9 @@
                 android:name="selectedArticle"
                 app:argType="com.example.newsapp.data.Article" />
         </action>
+        <action
+            android:id="@+id/action_technology_to_about2"
+            app:destination="@id/about2" />
     </fragment>
 
     <fragment
@@ -71,6 +80,9 @@
                 android:name="selectedArticle"
                 app:argType="com.example.newsapp.data.Article" />
         </action>
+        <action
+            android:id="@+id/action_entertainment_to_about2"
+            app:destination="@id/about2" />
     </fragment>
 
     <fragment
@@ -85,6 +97,12 @@
                 android:name="selectedArticle"
                 app:argType="com.example.newsapp.data.Article" />
         </action>
+        <action
+            android:id="@+id/action_health_to_about2"
+            app:destination="@id/about2" />
+        <action
+            android:id="@+id/action_health_to_about22"
+            app:destination="@id/about2" />
     </fragment>
 
     <fragment
@@ -99,6 +117,9 @@
                 android:name="selectedArticle"
                 app:argType="com.example.newsapp.data.Article" />
         </action>
+        <action
+            android:id="@+id/action_science_to_about2"
+            app:destination="@id/about2" />
     </fragment>
 
     <fragment
@@ -113,6 +134,12 @@
                 android:name="selectedArticle"
                 app:argType="com.example.newsapp.data.Article" />
         </action>
+        <action
+            android:id="@+id/action_sports_to_about2"
+            app:destination="@id/about2" />
+        <action
+            android:id="@+id/action_sports_to_about22"
+            app:destination="@id/about2" />
     </fragment>
 
     <fragment
@@ -127,6 +154,14 @@
                 android:name="selectArticle"
                 app:argType="com.example.newsapp.data.Article"/>
         </action>
+        <action
+            android:id="@+id/action_savedNewsFragment_to_about2"
+            app:destination="@id/about2" />
     </fragment>
+    <fragment
+        android:id="@+id/about2"
+        android:name="com.example.newsapp.fragments.About"
+        android:label="fragment_about"
+        tools:layout="@layout/fragment_about" />
 
 </navigation>

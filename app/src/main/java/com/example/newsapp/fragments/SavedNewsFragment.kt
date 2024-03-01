@@ -20,6 +20,7 @@ import com.example.newsapp.adapter.NewsAdapter
 import com.example.newsapp.data.Article
 import com.example.newsapp.databinding.FragmentSavedNewsBinding
 import com.example.newsapp.viewModel.ArticleViewModel
+import com.google.android.material.snackbar.Snackbar
 import kotlinx.coroutines.launch
 
 class SavedNewsFragment : Fragment(), NewsAdapter.OnItemClickListener {
@@ -73,10 +74,10 @@ class SavedNewsFragment : Fragment(), NewsAdapter.OnItemClickListener {
             val backStackEntryCount = requireActivity().supportFragmentManager.backStackEntryCount
             if (backStackEntryCount > 0) {
                 // Fragment is in the back stack, hide the FAB
-                mainActivity.hideFab()
+               // mainActivity.hideFab()
             } else {
                 // No fragments in the back stack, show the FAB
-                mainActivity.showFab()
+               // mainActivity.showFab()
             }
         }
     }
@@ -101,10 +102,12 @@ class SavedNewsFragment : Fragment(), NewsAdapter.OnItemClickListener {
                 if (isSaved != null) {
                     if (isSaved) {
                         articleViewModel.delete(article)
-                        Toast.makeText(requireContext(), "Article removed from saved list", Toast.LENGTH_SHORT).show()
+//                        Toast.makeText(requireContext(), "Article removed from saved list", Toast.LENGTH_SHORT).show()
+                        view?.let { Snackbar.make(it,"Article Delete ", Snackbar.LENGTH_SHORT).show() }
                     } else {
                         articleViewModel.insertByCategory(article,"default")
-                        Toast.makeText(requireContext(), "Article saved", Toast.LENGTH_SHORT).show()
+//                        Toast.makeText(requireContext(), "Article saved", Toast.LENGTH_SHORT).show()
+                        view?.let { Snackbar.make(it,"Article Saved ", Snackbar.LENGTH_SHORT).show() }
                     }
                 } else {
                     // Handle the case when isArticleSaved LiveData is null

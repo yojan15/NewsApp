@@ -1,11 +1,14 @@
 package com.example.newsapp
 
+import android.content.res.Configuration
 import android.os.Bundle
 import android.util.Log
 import android.view.Menu
+import android.view.MenuItem
 import android.view.View
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
+import androidx.appcompat.app.AppCompatDelegate
 import androidx.appcompat.widget.PopupMenu
 import androidx.appcompat.widget.SearchView
 import androidx.fragment.app.FragmentTransaction
@@ -17,7 +20,7 @@ import com.example.newsapp.api.NewsApi
 import com.example.newsapp.data.Article
 import com.example.newsapp.data.News
 import com.example.newsapp.databinding.ActivityMainBinding
-import com.example.newsapp.fragments.SavedNewsFragment
+import com.example.newsapp.fragments.About
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import retrofit2.Call
 import retrofit2.Callback
@@ -28,6 +31,7 @@ import retrofit2.converter.gson.GsonConverterFactory
 class MainActivity : AppCompatActivity() {
     private lateinit var binding: ActivityMainBinding
     private lateinit var navController: NavController
+    private var darkTheme = false
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -35,17 +39,19 @@ class MainActivity : AppCompatActivity() {
         setContentView(binding.root)
         supportActionBar?.title = "News"
 
-        val navHostFragment = supportFragmentManager.findFragmentById(R.id.fragmentContainerView) as NavHostFragment
-        navController = navHostFragment.navController
 
-        binding.ViewAllSavedNews.setOnClickListener {
-            val fragment = SavedNewsFragment()
-            supportFragmentManager.beginTransaction()
-                .replace(R.id.fragmentContainerView, fragment)
-                .addToBackStack(null)
-                .setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN)
-                .commit()
-        }
+        val navHostFragment =
+            supportFragmentManager.findFragmentById(R.id.fragmentContainerView) as NavHostFragment
+        navController = navHostFragment.navController
+//
+//        binding.ViewAllSavedNews.setOnClickListener {
+//            val fragment = SavedNewsFragment()
+//            supportFragmentManager.beginTransaction()
+//                .replace(R.id.fragmentContainerView, fragment)
+//                .addToBackStack(null)
+//                .setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN)
+//                .commit()
+        //}
         val fab: FloatingActionButton = binding.floatingActionButton
         fab.setOnClickListener {
             showPopupMenu(fab)
@@ -60,10 +66,12 @@ class MainActivity : AppCompatActivity() {
                 R.id.science -> "Science"
                 R.id.technology -> "Technology"
                 R.id.savedNewsFragment -> "Saved News"
+                R.id.about -> "About"
                 else -> "News"
             }
         }
     }
+
     private fun showPopupMenu(view: View) {
         val popupMenu = PopupMenu(this, view)
         popupMenu.inflate(R.menu.menu_fab)
@@ -110,14 +118,15 @@ class MainActivity : AppCompatActivity() {
         }
         popupMenu.show()
     }
-    fun showFab() {
-        binding.floatingActionButton.show()
-        binding.ViewAllSavedNews.show()
-    }
-    fun hideFab() {
-        binding.floatingActionButton.hide()
-        binding.ViewAllSavedNews.hide()
-    }
+
+    //    fun showFab() {
+//        binding.floatingActionButton.show()
+//        binding.ViewAllSavedNews.show()
+//    }
+//    fun hideFab() {
+//        binding.floatingActionButton.hide()
+//        binding.ViewAllSavedNews.hide()
+//    }
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
         menuInflater.inflate(R.menu.my_menu, menu)
 
@@ -131,6 +140,7 @@ class MainActivity : AppCompatActivity() {
                 }
                 return true
             }
+
             override fun onQueryTextChange(newText: String?): Boolean {
                 if (!newText.isNullOrBlank()) {
                     searchApi(newText)
@@ -140,6 +150,7 @@ class MainActivity : AppCompatActivity() {
         })
         return true
     }
+
     private fun searchApi(query: String) {
         val retrofit = Retrofit.Builder()
             .baseUrl("https://newsapi.org/v2/")
@@ -173,12 +184,51 @@ class MainActivity : AppCompatActivity() {
                     adapter.submitList(articles)
                 } else {
                     Log.e("searching", "failed")
-                    Toast.makeText(this@MainActivity,"No Data Found..",Toast.LENGTH_SHORT).show()
+                    Toast.makeText(this@MainActivity, "No Data Found..", Toast.LENGTH_SHORT).show()
                 }
             }
+
             override fun onFailure(call: Call<News>, t: Throwable) {
-               Log.e("MainActivity","$t")
+                Log.e("MainActivity", "$t")
             }
         })
+    }
+
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        when (item.itemId) {
+            R.id.save -> {
+                navController.navigate(R.id.savedNewsFragment)
+                // Toast.makeText(this,"saved Clicked",Toast.LENGTH_SHORT).show()
+            }
+
+            R.id.about -> {
+
+                val fragment = About()
+                supportFragmentManager.beginTransaction()
+                    .replace(R.id.fragmentContainerView, fragment)
+                    .addToBackStack(null)
+                    .setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN)
+                    .commit()
+                Toast.makeText(this, "About Clicked", Toast.LENGTH_SHORT).show()
+            }
+
+            R.id.action_toggle_day_night -> {
+                toggleDayNightTheme()
+                return true
+            }
+
+            else -> return super.onOptionsItemSelected(item)
+        }
+        return super.onOptionsItemSelected(item)
+    }
+    private fun toggleDayNightTheme() {
+        val currentNightMode = resources.configuration.uiMode and Configuration.UI_MODE_NIGHT_MASK
+        val newNightMode = when (currentNightMode) {
+            Configuration.UI_MODE_NIGHT_YES -> AppCompatDelegate.MODE_NIGHT_NO
+            Configuration.UI_MODE_NIGHT_NO -> AppCompatDelegate.MODE_NIGHT_YES
+            else -> AppCompatDelegate.MODE_NIGHT_FOLLOW_SYSTEM
+        }
+        AppCompatDelegate.setDefaultNightMode(newNightMode)
+        recreate() 
     }
 }

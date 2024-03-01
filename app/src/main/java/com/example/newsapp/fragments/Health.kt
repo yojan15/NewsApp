@@ -23,6 +23,7 @@ import com.example.newsapp.data.News
 import com.example.newsapp.data.toArticle
 import com.example.newsapp.databinding.FragmentHealthBinding
 import com.example.newsapp.viewModel.ArticleViewModel
+import com.google.android.material.snackbar.Snackbar
 import kotlinx.coroutines.launch
 import retrofit2.Call
 import retrofit2.Callback
@@ -176,12 +177,12 @@ class Health : Fragment(), NewsAdapter.OnItemClickListener {
                 if (isSaved != null) {
                     if (isSaved) {
                         articleViewModel.delete(article)
-                        Toast.makeText(
-                            requireContext(),
-                            "Article removed from saved list", Toast.LENGTH_SHORT).show()
+//                        Toast.makeText(requireContext(), "Article removed from saved list", Toast.LENGTH_SHORT).show()
+                        view?.let { Snackbar.make(it,"Article Delete ", Snackbar.LENGTH_SHORT).show() }
                     } else {
                         articleViewModel.saveArticle(article)
-                        Toast.makeText(requireContext(), "Article saved", Toast.LENGTH_SHORT).show()
+//                        Toast.makeText(requireContext(), "Article saved", Toast.LENGTH_SHORT).show()
+                        view?.let { Snackbar.make(it,"Article Saved ", Snackbar.LENGTH_SHORT).show() }
                     }
                 } else {
                     Toast.makeText(
