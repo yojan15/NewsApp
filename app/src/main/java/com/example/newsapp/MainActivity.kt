@@ -1,5 +1,6 @@
 package com.example.newsapp
 
+import android.content.Intent
 import android.content.res.Configuration
 import android.os.Bundle
 import android.util.Log
@@ -74,6 +75,13 @@ class MainActivity : AppCompatActivity() {
             }
         }
     }
+
+//    override fun onBackPressed() {
+//        super.onBackPressed()
+//        val intent = Intent(this, MainActivity::class.java)
+//        startActivity(intent)
+//        finish()
+//    }
 
     private fun showPopupMenu(view: View) {
         val popupMenu = PopupMenu(this, view)
@@ -212,12 +220,14 @@ class MainActivity : AppCompatActivity() {
             }
 
             R.id.about -> {
-                val fragment = About()
-                supportFragmentManager.beginTransaction()
-                    .replace(R.id.fragmentContainerView, fragment)
-                    .addToBackStack(null)
-                    .setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN)
-                    .commit()
+//                val fragment = About()
+//                supportFragmentManager.beginTransaction()
+//                    .replace(R.id.fragmentContainerView, fragment)
+//                    .addToBackStack(null)
+//                    .setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN)
+//                    .commit()
+                startActivity(Intent(this,AboutApp::class.java))
+                finish()
                 Toast.makeText(this, "About Clicked", Toast.LENGTH_SHORT).show()
             }
 

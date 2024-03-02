@@ -17,15 +17,14 @@ class About : Fragment()  {
     ): View {
         // Inflate the layout for this fragment
         binding = FragmentAboutBinding.inflate(inflater, container, false)
-        githubLink()
+//        githubLink()
         return binding.root
     }
-
-    private fun githubLink() {
-        binding.github.setOnClickListener {
-            val githubUrl = Uri.parse("https://github.com/yojan15/NewsApp")
-            val intent = Intent(Intent.ACTION_VIEW,githubUrl)
-            startActivity(intent)
-        }
-    }
+//    private fun githubLink() {
+//        binding.github.setOnClickListener {
+//            val githubUrl = Uri.parse("https://github.com/yojan15/NewsApp")
+//            val intent = Intent(Intent.ACTION_VIEW,githubUrl)
+//            startActivity(intent)
+//        }
+//    }
 }
