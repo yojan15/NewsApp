@@ -13,7 +13,6 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.app.AppCompatDelegate
 import androidx.appcompat.widget.PopupMenu
 import androidx.appcompat.widget.SearchView
-import androidx.fragment.app.FragmentTransaction
 import androidx.navigation.NavController
 import androidx.navigation.fragment.NavHostFragment
 import androidx.recyclerview.widget.RecyclerView
@@ -22,7 +21,6 @@ import com.example.newsapp.api.NewsApi
 import com.example.newsapp.data.Article
 import com.example.newsapp.data.News
 import com.example.newsapp.databinding.ActivityMainBinding
-import com.example.newsapp.fragments.About
 import com.example.newsapp.themeUtils.ThemeUtils
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import retrofit2.Call
