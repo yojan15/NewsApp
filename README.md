@@ -10,11 +10,12 @@ News App
 
 
 ## API Reference
+https://newsapi.org/s/google-news-in-api
 
 #### Get all items
 
 ```http
- https://newsapi.com
+https://newsapi.org/v2/top-headlines?sources=google-news-in&apiKey="YOUR_API KEY"
 ```
 
 | Parameter | Type     | Description                |
@@ -43,11 +44,14 @@ News App
 ![Screenshot 1](app/src/main/java/com/example/newsapp/screenShots/img.jpeg)
 *App in Night Mode .*
 
+![Screenshot 1](app/src/main/java/com/example/newsapp/screenShots/img2.jpeg)
+*App in Night Mode .*
+
 ![Screenshot 1](app/src/main/java/com/example/newsapp/screenShots/img3.jpeg)
-*App in Light Mode .*
+*App in Night Mode .*
 
 ![Screenshot 1](app/src/main/java/com/example/newsapp/screenShots/img4.jpeg)
-*Category wise news selection  .*
+*App in Night Mode .*
 
 
 ## Support
