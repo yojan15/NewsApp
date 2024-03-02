@@ -1,5 +1,11 @@
 News App 
+🚀 Real-time Updates: Instantly access the most recent news from around the globe. Our app ensures you're always in the know.
 
+🌐 Diverse Sources: Enjoy a comprehensive range of news sources, covering a multitude of topics, from politics and business to entertainment and technology. 
+
+📌 Personalized Feeds: Tailor your news feed to match your interests. Customize your preferences to receive updates on the topics that matter most to you.
+
+🔍 Search Functionality: Looking for specific news? Our powerful search feature allows you to find articles and topics effortlessly.
 
 
 
@@ -30,4 +36,21 @@ News App
 | `API_KEY`      | `string` |"your api_key"|
 
 
+
+
+## Screenshots
+
+![Screenshot 1](app/src/main/java/com/example/newsapp/screenShots/img.jpeg)
+*App in Night Mode .*
+
+![Screenshot 1](app/src/main/java/com/example/newsapp/screenShots/img3.jpeg)
+*App in Light Mode .*
+
+![Screenshot 1](app/src/main/java/com/example/newsapp/screenShots/img4.jpeg)
+*Category wise news selection  .*
+
+
+## Support
+
+For support, email yojankhuble1122@gmail.com
 
