@@ -3,6 +3,7 @@
     <color name="black">#FF000000</color>
     <color name="white">#FFFFFFFF</color>
     <color name="blue">#3d82ed</color>
-    <color name="grey">#b9b2aa</color>
-
+    <color name="grey">#999</color>
+    <color name="custom_snackbar_color">#F50404</color>
+    <color name="custom_grey">#7F7F7F</color>
 </resources>

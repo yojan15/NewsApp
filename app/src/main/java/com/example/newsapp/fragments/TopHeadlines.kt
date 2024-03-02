@@ -10,12 +10,15 @@ import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
+import androidx.core.content.ContextCompat
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
+import com.example.newsapp.R
 import com.example.newsapp.adapter.NewsAdapter
 import com.example.newsapp.api.RetrofitClient
 import com.example.newsapp.data.Article
@@ -23,6 +26,7 @@ import com.example.newsapp.data.News
 import com.example.newsapp.data.toArticle
 import com.example.newsapp.databinding.FragmentTopHeadlinesBinding
 import com.example.newsapp.viewModel.ArticleViewModel
+import com.google.android.material.snackbar.Snackbar
 import kotlinx.coroutines.launch
 import retrofit2.Call
 import retrofit2.Callback
@@ -33,6 +37,8 @@ class TopHeadlines : Fragment(), NewsAdapter.OnItemClickListener {
     private lateinit var articleViewModel: ArticleViewModel
     private val savedArticles = mutableSetOf<String>()
 
+    private var currentCategory: String = "TopNews"
+
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
@@ -40,30 +46,43 @@ class TopHeadlines : Fragment(), NewsAdapter.OnItemClickListener {
         binding = FragmentTopHeadlinesBinding.inflate(inflater, container, false)
         articleViewModel = ViewModelProvider(this)[ArticleViewModel::class.java]
 
-
-        articleViewModel.allCachedArticles.observe(viewLifecycleOwner) { cachedArticles ->
-            /**
-             * gets all the articles from cacheArticle table when user is not connected to internet
-             */
+        articleViewModel.getArticlesByCategory(currentCategory).observe(viewLifecycleOwner) { cachedArticles ->
             val articles = cachedArticles.map { it.toArticle() }
             newsAdapter.submitList(articles)
+        }
+
+
+        // Observe cached articles from the cacheArticle table
+//        articleViewModel.allCachedArticles.observe(viewLifecycleOwner) { cachedArticles ->
+//            // Clear the existing list of articles to show only category-wise articles
+//            newsAdapter.submitList(emptyList())
+//
+//            // Get all the articles from cacheArticle table when the user is not connected to the internet
+//            val articles = cachedArticles.map { it.toArticle() }
+//            newsAdapter.submitList(articles)
 
             // Now, observe saved articles and update the list
             articleViewModel.allArticle.observe(viewLifecycleOwner) { savedArticles ->
                 Log.d("TopHeadlines", "Saved articles: $savedArticles")
-                /**
-                 * gets all the articles from Article table when user is connected to internet
-                 */
+                // Get all the articles from the Article table when the user is connected to the internet
                 this.savedArticles.clear()
                 this.savedArticles.addAll(savedArticles.map { it.url })
             }
-        }
+
         setupRecyclerView()
         getNews()   // calling the function to getNews
         setupSwipeRefreshLayout()
         return binding.root
     }
+    fun updateCurrentCategory(category: String) {
+        currentCategory = category
 
+        // Update the observation of cached articles based on the new category
+        articleViewModel.getArticlesByCategory(currentCategory).observe(viewLifecycleOwner) { cachedArticles ->
+            val articles = cachedArticles.map { it.toArticle() }
+            newsAdapter.submitList(articles)
+        }
+    }
     private fun setupSwipeRefreshLayout() {
         binding.topHeadlinesSwipeRefreshLayout.setOnRefreshListener {
             if (isNetworkAvailable()) {
@@ -82,20 +101,40 @@ class TopHeadlines : Fragment(), NewsAdapter.OnItemClickListener {
             .setMessage("Please connect to the internet and try again.")
             .setPositiveButton("Retry") { dialogInterface: DialogInterface, _: Int ->
                 dialogInterface.dismiss()
+
                 if (isNetworkAvailable()) {
                     getNews()
                     articleViewModel.deleteAllCachedArticles()
                 } else {
-                    showOfflineDialog()
+                    view?.let {
+                        val customSnackbarView = LayoutInflater.from(it.context)
+                            .inflate(R.layout.custom_snackbar_layout, null)
+                        val snackbar = Snackbar.make(it, "", Snackbar.LENGTH_SHORT)
+                        val msg = "No Connection"
+                        val textView = customSnackbarView.findViewById<TextView>(android.R.id.text1)
+                        textView.text = msg
+
+                        // Set background color
+                        snackbar.view.setBackgroundColor(
+                            ContextCompat.getColor(
+                                it.context,
+                                R.color.custom_snackbar_color))
+                        (snackbar.view as Snackbar.SnackbarLayout).apply {
+                            removeAllViews() // Remove existing views
+                            addView(customSnackbarView)
+                        }
+                        snackbar.show()
+                    }
                 }
+                }
+                    .setNegativeButton("Exit") { dialogInterface: DialogInterface, _: Int ->
+                        dialogInterface.dismiss()
+                        requireActivity().finish()
+                    }
+                    .setCancelable(false)
+                    .show()
             }
-            .setNegativeButton("Exit") { dialogInterface: DialogInterface, _: Int ->
-                dialogInterface.dismiss()
-                requireActivity().finish()
-            }
-            .setCancelable(false)
-            .show()
-    }
+
     private fun isNetworkAvailable(): Boolean {
         val connectivityManager =
             requireContext().getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
@@ -136,12 +175,10 @@ class TopHeadlines : Fragment(), NewsAdapter.OnItemClickListener {
                                 if (isSaved != null && isSaved) {
                                     // Delete the entire cache when a new article is saved
                                     articleViewModel.deleteAllCachedArticles()
-                                    Toast.makeText(
-                                        requireContext(), "Article removed from saved list", Toast.LENGTH_SHORT
-                                    ).show()
+//                                Toast.makeText(requireContext(), "Article removed from saved list", Toast.LENGTH_SHORT).show()
                                 } else {
-                                    // Insert new articles into the cache
-                                    articleViewModel.insert(article)
+                                    // Insert new articles into the cache with the "TopNews" category
+                                    articleViewModel.insertByCategory(article, "TopNews")
                                 }
                             }
                         }
@@ -162,6 +199,7 @@ class TopHeadlines : Fragment(), NewsAdapter.OnItemClickListener {
         })
     }
 
+
     override fun onTitleClick(article: Article) {
         lifecycleScope.launch {
             val isSavedLiveData = articleViewModel.isArticleSaved(article.url)
@@ -169,12 +207,13 @@ class TopHeadlines : Fragment(), NewsAdapter.OnItemClickListener {
                 if (isSaved != null) {
                     if (isSaved) {
                         articleViewModel.delete(article)
-                        Toast.makeText(
-                            requireContext(),
-                            "Article removed from saved list", Toast.LENGTH_SHORT).show()
+//                        Toast.makeText(requireContext(),"Article removed from saved list", Toast.LENGTH_SHORT).show()
+                        view?.let { Snackbar.make(it,"Article Removed ",Snackbar.LENGTH_SHORT).show() }
                     } else {
                         articleViewModel.saveArticle(article)
-                        Toast.makeText(requireContext(), "Article saved", Toast.LENGTH_SHORT).show()
+//                        Toast.makeText(requireContext(), "Article saved", Toast.LENGTH_SHORT).show()
+                  view?.let { Snackbar.make(it,"Article Saved",Snackbar.LENGTH_SHORT).show() }
+
                     }
                 } else {
                     Toast.makeText(

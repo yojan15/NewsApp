@@ -7,7 +7,7 @@ import androidx.room.RoomDatabase
 import androidx.room.migration.Migration
 import androidx.sqlite.db.SupportSQLiteDatabase
 
-@Database(entities = [CachedArticle::class , Article::class], version = 2, exportSchema = false)
+@Database(entities = [CachedArticle::class , Article::class], version = 3, exportSchema = false)
 abstract class AppDatabase : RoomDatabase() {
     abstract fun articleDao(): ArticleDao
 
@@ -28,13 +28,14 @@ abstract class AppDatabase : RoomDatabase() {
             }
         }
 
-        private val MIGRATION_1_2: Migration = object : Migration(1, 2) {
+        private val MIGRATION_1_2: Migration = object : Migration(2 ,3) {
             override fun migrate(database: SupportSQLiteDatabase) {
                 // Create the cached_articles table if it doesn't exist
                 database.execSQL("CREATE TABLE IF NOT EXISTS cached_articles (publishedAt TEXT, author TEXT, urlToImage TEXT, description TEXT, title TEXT, url TEXT PRIMARY KEY, content TEXT)")
 
                 // Add the new_column to the table
                 database.execSQL("ALTER TABLE cached_articles ADD COLUMN new_column TEXT")
+                database.execSQL("ALTER TABLE article ADD COLUMN new_column TEXT")
             }
         }
     }

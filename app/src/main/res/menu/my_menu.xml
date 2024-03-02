@@ -7,11 +7,28 @@
         app:showAsAction="ifRoom|collapseActionView"
         android:title="search" />
 
-<!--    <item-->
+    <item
+        android:id="@+id/action_toggle_day_night"
+        app:actionViewClass="android.widget.ImageView"
+        android:title="Toggle Day/Night"
+        app:showAsAction="ifRoom" />
+
+
+    <!--    <item-->
 <!--        android:id="@+id/saveNews"-->
 <!--        android:icon="@drawable/baseline_save_24"-->
 <!--        app:actionViewClass="androidx.appcompat.widget.SearchView"-->
 <!--        app:showAsAction="ifRoom|collapseActionView"-->
 <!--        android:title="save" />-->
+
+    <item
+        android:id="@+id/save"
+        android:icon="@drawable/baseline_save_24"
+            android:title="Saved"/>
+
+    <item
+        android:id="@+id/about"
+        android:icon="@drawable/baseline_info_24"
+        android:title="About"/>
 
 </menu>

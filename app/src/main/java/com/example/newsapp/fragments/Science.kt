@@ -23,6 +23,7 @@ import com.example.newsapp.data.News
 import com.example.newsapp.data.toArticle
 import com.example.newsapp.databinding.FragmentScienceBinding
 import com.example.newsapp.viewModel.ArticleViewModel
+import com.google.android.material.snackbar.Snackbar
 import kotlinx.coroutines.launch
 import retrofit2.Call
 import retrofit2.Callback
@@ -33,6 +34,7 @@ class Science : Fragment(), NewsAdapter.OnItemClickListener {
     private lateinit var newsAdapter: NewsAdapter
     private lateinit var articleViewModel: ArticleViewModel
     private var savedArticles = mutableSetOf<String>()
+    private val currentCategory = "Science"
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
@@ -43,22 +45,26 @@ class Science : Fragment(), NewsAdapter.OnItemClickListener {
         articleViewModel = ViewModelProvider(this)[ArticleViewModel::class.java]
 
 
-        articleViewModel.allCachedArticles.observe(viewLifecycleOwner) { cachedArticles ->
-            /**
-             * gets all the articles from cacheArticle table when user is not connected to internet
-             */
+        articleViewModel.getArticlesByCategory(currentCategory).observe(viewLifecycleOwner) { cachedArticles ->
             val articles = cachedArticles.map { it.toArticle() }
             newsAdapter.submitList(articles)
+        }
 
-            // Now, observe saved articles and update the list
-            articleViewModel.allArticle.observe(viewLifecycleOwner) { savedArticles ->
-                Log.d("TopHeadlines", "Saved articles: $savedArticles")
-                /**
-                 * gets all the articles from Article table when user is connected to internet
-                 */
-                this.savedArticles.clear()
-                this.savedArticles.addAll(savedArticles.map { it.url })
-            }
+        // Observe cached articles from the cacheArticle table
+//        articleViewModel.allCachedArticles.observe(viewLifecycleOwner) { cachedArticles ->
+//            // Clear the existing list of articles to show only category-wise articles
+//            newsAdapter.submitList(emptyList())
+//
+//            // Get all the articles from cacheArticle table when the user is not connected to the internet
+//            val articles = cachedArticles.map { it.toArticle() }
+//            newsAdapter.submitList(articles)
+
+        // Now, observe saved articles and update the list
+        articleViewModel.allArticle.observe(viewLifecycleOwner) { savedArticles ->
+            Log.d("TopHeadlines", "Saved articles: $savedArticles")
+            // Get all the articles from the Article table when the user is connected to the internet
+            this.savedArticles.clear()
+            this.savedArticles.addAll(savedArticles.map { it.url })
         }
         getNews()   // calling the function to getNews
         setupSwipeRefreshLayout()
@@ -115,13 +121,10 @@ class Science : Fragment(), NewsAdapter.OnItemClickListener {
         binding.scienceRecyclerView.layoutManager = LinearLayoutManager(requireContext())
     }
     private fun getNews() {
-        /**
-         * create an instance of a retrofit to call the articles from base url
-         */
-        val scienceNewsApi = RetrofitClient.scienceNewsApi
+        val newsApi = RetrofitClient.scienceNewsApi
         binding.scienceSwipeRefreshLayout.isRefreshing = false
 
-        val retrofitData = scienceNewsApi.getNews()
+        val retrofitData = newsApi.getNews()
         retrofitData.enqueue(object : Callback<News> {
 
             override fun onResponse(call: Call<News>, response: Response<News>) {
@@ -141,18 +144,17 @@ class Science : Fragment(), NewsAdapter.OnItemClickListener {
                             lifecycleScope.launch {
                                 val isSaved = articleViewModel.isArticleSaved(article.url).value
                                 if (isSaved != null && isSaved) {
-                                    // Delete all cached articles when a new article is saved
+                                    // Delete the entire cache when a new article is saved
                                     articleViewModel.deleteAllCachedArticles()
-                                    Toast.makeText(
-                                        requireContext(), "Article removed from saved list", Toast.LENGTH_SHORT
-                                    ).show()
+//                                Toast.makeText(requireContext(), "Article removed from saved list", Toast.LENGTH_SHORT).show()
                                 } else {
-                                    articleViewModel.insert(article)
+                                    // Insert new articles into the cache with the "TopNews" category
+                                    articleViewModel.insertByCategory(article, "Science")
                                 }
                             }
-                            // Only submit the list of new articles to the adapter
-                            newsAdapter.submitList(newArticles)
                         }
+                        // Only submit the list of new articles to the adapter
+                        newsAdapter.submitList(newArticles)
                     } else {
                         Log.e("com.example.newsapp.MainActivity", "News response is null")
                     }
@@ -167,6 +169,7 @@ class Science : Fragment(), NewsAdapter.OnItemClickListener {
             }
         })
     }
+
     override fun onTitleClick(article: Article) {
         lifecycleScope.launch {
             val isSavedLiveData = articleViewModel.isArticleSaved(article.url)
@@ -174,12 +177,12 @@ class Science : Fragment(), NewsAdapter.OnItemClickListener {
                 if (isSaved != null) {
                     if (isSaved) {
                         articleViewModel.delete(article)
-                        Toast.makeText(
-                            requireContext(),
-                            "Article removed from saved list", Toast.LENGTH_SHORT).show()
+//                        Toast.makeText(requireContext(), "Article removed from saved list", Toast.LENGTH_SHORT).show()
+                        view?.let { Snackbar.make(it,"Article Delete ", Snackbar.LENGTH_SHORT).show() }
                     } else {
                         articleViewModel.saveArticle(article)
-                        Toast.makeText(requireContext(), "Article saved", Toast.LENGTH_SHORT).show()
+//                        Toast.makeText(requireContext(), "Article saved", Toast.LENGTH_SHORT).show()
+                        view?.let { Snackbar.make(it,"Article Saved ", Snackbar.LENGTH_SHORT).show() }
                     }
                 } else {
                     Toast.makeText(

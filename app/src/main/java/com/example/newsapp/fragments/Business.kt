@@ -23,6 +23,7 @@ import com.example.newsapp.data.News
 import com.example.newsapp.data.toArticle
 import com.example.newsapp.databinding.FragmentBusinessBinding
 import com.example.newsapp.viewModel.ArticleViewModel
+import com.google.android.material.snackbar.Snackbar
 import kotlinx.coroutines.launch
 import retrofit2.Call
 import retrofit2.Callback
@@ -33,32 +34,38 @@ class Business : Fragment() , NewsAdapter.OnItemClickListener {
     private lateinit var newsAdapter : NewsAdapter
     private lateinit var articleViewModel: ArticleViewModel
     private var savedArticles = mutableSetOf<String>()
+    private var currentCategory = "Business"
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View {
+    ): View {;
         binding = FragmentBusinessBinding.inflate(inflater, container, false)
-        setupRecyclerView()
+
         articleViewModel = ViewModelProvider(this)[ArticleViewModel::class.java]
 
-
-        articleViewModel.allCachedArticles.observe(viewLifecycleOwner) { cachedArticles ->
-            /**
-             * gets all the articles from cacheArticle table when user is not connected to internet
-             */
+        articleViewModel.getArticlesByCategory(currentCategory).observe(viewLifecycleOwner) { cachedArticles ->
             val articles = cachedArticles.map { it.toArticle() }
             newsAdapter.submitList(articles)
+        }
+
+        // Observe cached articles from the cacheArticle table
+//        articleViewModel.allCachedArticles.observe(viewLifecycleOwner) { cachedArticles ->
+//            // Clear the existing list of articles to show only category-wise articles
+//            newsAdapter.submitList(emptyList())
+//
+//            // Get all the articles from cacheArticle table when the user is not connected to the internet
+//            val articles = cachedArticles.map { it.toArticle() }
+//            newsAdapter.submitList(articles)
 
             // Now, observe saved articles and update the list
             articleViewModel.allArticle.observe(viewLifecycleOwner) { savedArticles ->
                 Log.d("TopHeadlines", "Saved articles: $savedArticles")
-                /**
-                 * gets all the articles from Article table when user is connected to internet
-                 */
+                // Get all the articles from the Article table when the user is connected to the internet
                 this.savedArticles.clear()
                 this.savedArticles.addAll(savedArticles.map { it.url })
             }
-        }
+
+        setupRecyclerView()
         getNews()   // calling the function to getNews
         setupSwipeRefreshLayout()
         return binding.root
@@ -113,13 +120,10 @@ class Business : Fragment() , NewsAdapter.OnItemClickListener {
         binding.businessRecyclerView.layoutManager = LinearLayoutManager(requireContext())
     }
     private fun getNews() {
-        /**
-         * create an instance of a retrofit to call the articles from base url
-         */
-        val businessNewsApi = RetrofitClient.businessNewsApi
+        val newsApi = RetrofitClient.businessNewsApi
         binding.swipeRefreshLayout.isRefreshing = false
 
-        val retrofitData = businessNewsApi.getNews()
+        val retrofitData = newsApi.getNews()
         retrofitData.enqueue(object : Callback<News> {
 
             override fun onResponse(call: Call<News>, response: Response<News>) {
@@ -139,11 +143,12 @@ class Business : Fragment() , NewsAdapter.OnItemClickListener {
                             lifecycleScope.launch {
                                 val isSaved = articleViewModel.isArticleSaved(article.url).value
                                 if (isSaved != null && isSaved) {
+                                    // Delete the entire cache when a new article is saved
                                     articleViewModel.deleteAllCachedArticles()
-                                    Toast.makeText(
-                                        requireContext(), "Article removed from saved list", Toast.LENGTH_SHORT).show()
+//                                Toast.makeText(requireContext(), "Article removed from saved list", Toast.LENGTH_SHORT).show()
                                 } else {
-                                    articleViewModel.insert(article)
+                                    // Insert new articles into the cache with the "TopNews" category
+                                    articleViewModel.insertByCategory(article, "Business")
                                 }
                             }
                         }
@@ -163,6 +168,7 @@ class Business : Fragment() , NewsAdapter.OnItemClickListener {
             }
         })
     }
+
     override fun onTitleClick(article: Article) {
         lifecycleScope.launch {
             val isSavedLiveData = articleViewModel.isArticleSaved(article.url)
@@ -170,12 +176,12 @@ class Business : Fragment() , NewsAdapter.OnItemClickListener {
                 if (isSaved != null) {
                     if (isSaved) {
                         articleViewModel.delete(article)
-                        Toast.makeText(
-                            requireContext(),
-                            "Article removed from saved list", Toast.LENGTH_SHORT).show()
+                       // Toast.makeText(requireContext(),"Article removed from saved list", Toast.LENGTH_SHORT).show()
+                        view?.let { Snackbar.make(it,"Article Removed ", Snackbar.LENGTH_SHORT).show() }
                     } else {
                         articleViewModel.saveArticle(article)
-                        Toast.makeText(requireContext(), "Article saved", Toast.LENGTH_SHORT).show()
+                        //Toast.makeText(requireContext(), "Article saved", Toast.LENGTH_SHORT).show()
+                        view?.let { Snackbar.make(it,"Article Saved ", Snackbar.LENGTH_SHORT).show() }
                     }
                 } else {
                     Toast.makeText(
